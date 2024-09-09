@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import CreateBusiness from "@/components/Business/CreateBusiness";
+import BusinessCategories from "@/components/Business/BusinessCategories";
 
 const createBusiness = () => {
-  return <CreateBusiness />;
+  return <BusinessCategories />;
 };
 
 export default createBusiness;

@@ -12,10 +12,7 @@ import React, { useLayoutEffect } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import { createBusinessTypes } from "@/constants/Business";
 
-export default function ElevatedCards() {
-  function openWebsite(websiteLink: string) {
-    Linking.openURL(websiteLink);
-  }
+export default function BusinessCategories() {
   const navigation = useNavigation();
 
   useLayoutEffect(() => {
@@ -24,7 +21,9 @@ export default function ElevatedCards() {
       // headerTransparent: true,
     });
   }, []);
+
   const router = useRouter();
+
   return (
     <>
       <View style={{ backgroundColor: "#fff" }}>
@@ -36,7 +35,9 @@ export default function ElevatedCards() {
                   // @ts-ignore
                   <View key={index} style={styles.containerTwo}>
                     <TouchableOpacity
-                      onPress={() => router.push(businessType.onPress())}
+                      onPress={() =>
+                        router.push(`/business/${businessType.value}`)
+                      }
                     >
                       <View
                         style={[
@@ -62,9 +63,7 @@ export default function ElevatedCards() {
 
                     {index + 1 < createBusinessTypes.length && (
                       <TouchableOpacity
-                        onPress={() =>
-                          router.push(createBusinessTypes[index + 1].onPress())
-                        }
+                        onPress={() => router.push(`/business/${businessType.value}`)}
                       >
                         <View
                           style={[
