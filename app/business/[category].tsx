@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useLayoutEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   createBusinessTypes,
@@ -16,6 +16,7 @@ import {
   BusinessOptions,
 } from "@/constants/Business";
 import { BALANCE_KEY, BUSINESSES_KEY } from "@/components/global/Business";
+import { useBusinessContext } from "@/lib/context";
 
 interface Business extends BusinessOptions {
   name: string;
@@ -23,10 +24,18 @@ interface Business extends BusinessOptions {
 
 const BusinessOption: React.FC = () => {
   const { category } = useLocalSearchParams<{ category: string }>();
-  const router = useRouter();
 
-  const [balance, setBalance] = useState<number>(0);
-  const [ownedBusinesses, setOwnedBusinesses] = useState<Business[]>([]);
+  const navigation = useNavigation();
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+      // headerTransparent: true,
+    });
+  }, []);
+
+  const router = useRouter();
+  const {balance, ownedBusinesses, updateBalance, updateBusinesses} = useBusinessContext();
+
   const [newBusinessName, setNewBusinessName] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<BusinessOptions | null>(
     null
@@ -35,51 +44,6 @@ const BusinessOption: React.FC = () => {
   const businessType = createBusinessTypes.find(
     (type) => type.value === category
   );
-
-  useEffect(() => {
-    fetchBalance();
-    fetchBusinesses();
-  }, []);
-
-  const fetchBalance = async () => {
-    try {
-      const storedBalance = await AsyncStorage.getItem(BALANCE_KEY);
-      if (storedBalance !== null) {
-        setBalance(parseFloat(storedBalance));
-      }
-    } catch (error) {
-      console.error("Error fetching balance:", error);
-    }
-  };
-
-  const fetchBusinesses = async () => {
-    try {
-      const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
-      if (storedBusinesses !== null) {
-        setOwnedBusinesses(JSON.parse(storedBusinesses));
-      }
-    } catch (error) {
-      console.error("Error fetching businesses:", error);
-    }
-  };
-
-  const updateBalance = async (newBalance: number) => {
-    try {
-      await AsyncStorage.setItem(BALANCE_KEY, newBalance.toString());
-      setBalance(newBalance);
-    } catch (error) {
-      console.error("Error updating balance:", error);
-    }
-  };
-
-  const updateBusinesses = async (newBusinesses: Business[]) => {
-    try {
-      await AsyncStorage.setItem(BUSINESSES_KEY, JSON.stringify(newBusinesses));
-      setOwnedBusinesses(newBusinesses);
-    } catch (error) {
-      console.error("Error updating businesses:", error);
-    }
-  };
 
   const buyBusiness = () => {
     if (!selectedOption || !newBusinessName || balance < selectedOption.price) {
@@ -100,7 +64,7 @@ const BusinessOption: React.FC = () => {
     Alert.alert("Success", `You've purchased ${newBusinessName}!`);
     setNewBusinessName("");
     setSelectedOption(null);
-    router.back(); // Navigate back after purchase
+    router.back();
   };
 
   const renderOption = ({ item }: { item: BusinessOptions }) => (
