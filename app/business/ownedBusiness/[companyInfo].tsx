@@ -1,6 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import BusinessInfo from "@/components/Business/BusinessInfo";
 
 const companyInfo = () => {
   const { companyInfo } = useLocalSearchParams();
@@ -10,13 +11,19 @@ const companyInfo = () => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: "",
-      headerTransparent: false,
+      headerTransparent: true,
     });
   }, []);
 
   return (
     <View>
-      <Text>{companyInfo}</Text>
+      <BusinessInfo 
+        // incomePerHour={102.06}
+        // stage={1}
+        // requiredInvestment={1469.7}
+        // expectedProfitGrowth={35.72}
+        // balance="22,674,053,319,711,100.00"
+      />
     </View>
   );
 };
