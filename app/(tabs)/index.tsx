@@ -4,7 +4,6 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useBusinessContext } from "@/lib/context";
 
 const App = () => {
-
   const { balance, updateBalance } = useBusinessContext();
 
   return (
@@ -24,7 +23,7 @@ const App = () => {
                 </View>
               </View>
               <Text style={styles.headingTxt}>Balance:</Text>
-              <Text style={[styles.balanceTxt]}> $ {balance}</Text>
+              <Text style={[styles.balanceTxt]}> $ {balance.toLocaleString()}</Text>
             </View>
           </View>
           <View style={styles.containerInTwo}>
