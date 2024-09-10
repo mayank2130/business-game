@@ -9,10 +9,10 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const BALANCE_KEY = "@game_balance";
-const BUSINESSES_KEY = "@game_businesses";
+export const BALANCE_KEY = "@game_balance";
+export const BUSINESSES_KEY = "@game_businesses";
 
-interface Business {
+export interface Business {
   id: string;
   name: string;
   category: string;
@@ -113,7 +113,7 @@ const GameComponent: React.FC = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.balanceText}>Balance: ${balance.toFixed(2)}</Text>
-      <Button title="Add $100" onPress={() => addBalance(100)} />
+      <Button title="Add $100" onPress={() => addBalance(10000)} />
 
       <Text style={styles.sectionTitle}>Buy a Business</Text>
       <TextInput

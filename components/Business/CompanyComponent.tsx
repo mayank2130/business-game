@@ -1,59 +1,37 @@
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  FlatList,
-} from "react-native";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { fetchBusinesses } from "@/lib/storage";
-import OwnedBusiness from "./OwnedBusiness";
+import { CompanyProps } from "./Home";
 
-type MaterialCommunityIconName = React.ComponentProps<
-  typeof MaterialCommunityIcons
->["name"];
-
-export interface CompanyProps {
-  name: string;
-  type: string;
-  income: string;
-  iconName: MaterialCommunityIconName;
-  iconColor: string;
-  status?: string;
-}
-
-const HomeScreen = () => {
-  const router = useRouter();
-  return (
-    <>
-      <View style={styles.container}>
-        <View style={styles.incomeCard}>
-          <Text style={styles.incomeAmount}>$ 102.06</Text>
-          <Text style={styles.incomeDescription}>Total income per hour</Text>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={styles.startButton}
-            onPress={() => router.push("/createBusiness")}
-          >
-            <Text style={styles.startButtonText}>Start a business</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.mergeButton}>
-            <Text style={styles.mergeButtonText}>Business mergers</Text>
-          </TouchableOpacity>
-        </View>
-
-        <Text style={styles.sectionTitle}>My companies</Text>
-        <OwnedBusiness />
+export const CompanyComponent: React.FC<CompanyProps> = ({
+  name,
+  type,
+  income,
+  iconName,
+  iconColor,
+  status,
+}) => (
+  <View style={styles.companyOuterContainer}>
+    <View style={styles.companyContainer}>
+      <View style={[styles.companyIcon, { backgroundColor: iconColor }]}>
+        <MaterialCommunityIcons name={iconName} size={24} color="white" />
       </View>
-    </>
-  );
-};
+      <View style={styles.companyInfo}>
+        <Text style={styles.companyName}>{name}</Text>
+        <Text style={styles.companyType}>{type}</Text>
+      </View>
+      <TouchableOpacity style={styles.arrowButton}>
+        <MaterialCommunityIcons name="chevron-right" size={24} color="gray" />
+      </TouchableOpacity>
+    </View>
+    <View style={styles.companyIncome}>
+      <Text style={styles.incomeText}>{income}</Text>
+      {status && <Text style={styles.statusText}>{status}</Text>}
+    </View>
+  </View>
+);
 
+export default CompanyComponent;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -80,7 +58,7 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     flexDirection: "row",
-    marginBottom: 18,
+    marginBottom: 16,
   },
   startButton: {
     backgroundColor: "#007AFF",
@@ -109,7 +87,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   companyOuterContainer: {
     flexDirection: "column",
@@ -165,5 +143,3 @@ const styles = StyleSheet.create({
     color: "gray",
   },
 });
-
-export default HomeScreen;
