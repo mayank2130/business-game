@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { BALANCE_KEY, BUSINESSES_KEY } from '@/components/global/Business';
+
+export const BALANCE_KEY = "@game_balance";
+export const BUSINESSES_KEY = "@game_businesses";
 
 interface Business {
   id: string;

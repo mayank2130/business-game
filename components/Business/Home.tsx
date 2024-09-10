@@ -11,6 +11,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { fetchBusinesses } from "@/lib/storage";
 import OwnedBusiness from "./OwnedBusiness";
+import { useBusinessContext } from "@/lib/context";
 
 type MaterialCommunityIconName = React.ComponentProps<
   typeof MaterialCommunityIcons
@@ -26,12 +27,14 @@ export interface CompanyProps {
 }
 
 const HomeScreen = () => {
+  const { balance } = useBusinessContext();
+
   const router = useRouter();
   return (
     <>
       <View style={styles.container}>
         <View style={styles.incomeCard}>
-          <Text style={styles.incomeAmount}>$ 102.06</Text>
+          <Text style={styles.incomeAmount}>$ {balance}</Text>
           <Text style={styles.incomeDescription}>Total income per hour</Text>
         </View>
 

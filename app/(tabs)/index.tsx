@@ -1,24 +1,16 @@
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-// import { LinearGradient } from "expo-linear-gradient";
 import { FontAwesome } from "@expo/vector-icons";
-// import { useBalance } from "@/Redux/BalanceContext";
+import { useBusinessContext } from "@/lib/context";
 
 const App = () => {
-  // const { balance, deductBalance, increaseBalance } = useBalance();
-  // const makeMoney = () => {
-  //   increaseBalance(10);
-  // };
+
+  const { balance, updateBalance } = useBusinessContext();
+
   return (
     <>
       <View style={{ backgroundColor: "#ffffff" }}>
         <View style={{ height: 280 }}>
-          {/* <LinearGradient
-            colors={["#0C0F14", "#21262E"]}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={styles.gradient}
-          > */}
           <View style={[styles.containerInOne]}>
             <View style={{ flexDirection: "column" }}>
               <View style={styles.logoContainer}>
@@ -32,18 +24,17 @@ const App = () => {
                 </View>
               </View>
               <Text style={styles.headingTxt}>Balance:</Text>
-              {/* <Text style={[styles.balanceTxt]}> $ {balance}</Text> */}
+              <Text style={[styles.balanceTxt]}> $ {balance}</Text>
             </View>
           </View>
           <View style={styles.containerInTwo}>
             <Text style={[styles.footerTxt]}>$ 10.0</Text>
             <Text style={[styles.footerNextTxt]}>per click</Text>
           </View>
-          {/* </LinearGradient> */}
         </View>
       </View>
       <TouchableOpacity
-        // onPress={() => makeMoney()}
+        onPress={() => updateBalance(2000000)}
         style={[styles.containerTwo, { backgroundColor: "#fff" }]}
       >
         <FontAwesome name="hand-o-up" size={75} color="black" />
