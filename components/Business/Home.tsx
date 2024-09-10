@@ -24,6 +24,7 @@ export interface CompanyProps {
   iconName: MaterialCommunityIconName;
   iconColor: string;
   status?: string;
+  onPress:() => void;
 }
 
 const HomeScreen = () => {
@@ -34,7 +35,7 @@ const HomeScreen = () => {
     <>
       <View style={styles.container}>
         <View style={styles.incomeCard}>
-          <Text style={styles.incomeAmount}>$ {balance}</Text>
+          <Text style={styles.incomeAmount}>$ {balance.toLocaleString()}</Text>
           <Text style={styles.incomeDescription}>Total income per hour</Text>
         </View>
 

@@ -10,8 +10,9 @@ export const CompanyComponent: React.FC<CompanyProps> = ({
   iconName,
   iconColor,
   status,
+  onPress,
 }) => (
-  <View style={styles.companyOuterContainer}>
+  <TouchableOpacity onPress={onPress} style={styles.companyOuterContainer}>
     <View style={styles.companyContainer}>
       <View style={[styles.companyIcon, { backgroundColor: iconColor }]}>
         <MaterialCommunityIcons name={iconName} size={24} color="white" />
@@ -28,7 +29,7 @@ export const CompanyComponent: React.FC<CompanyProps> = ({
       <Text style={styles.incomeText}>{income}</Text>
       {status && <Text style={styles.statusText}>{status}</Text>}
     </View>
-  </View>
+  </TouchableOpacity>
 );
 
 export default CompanyComponent;

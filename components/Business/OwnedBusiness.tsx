@@ -2,10 +2,11 @@ import React from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useBusinessContext } from "@/lib/context";
 import CompanyComponent from "./CompanyComponent";
+import { useRouter } from "expo-router";
 
 const OwnedBusiness = () => {
   const { ownedBusinesses } = useBusinessContext();
-
+  const router = useRouter();
   if (ownedBusinesses.length === 0) {
     return (
       <Text style={styles.noBusinessText}>
@@ -18,16 +19,15 @@ const OwnedBusiness = () => {
     <FlatList
       data={ownedBusinesses}
       renderItem={({ item }) => (
-        <View>
-          <CompanyComponent
-            name={item.name}
-            type="Car dealership"
-            income="$ 0.00"
-            iconName="car"
-            iconColor="blue"
-            status="Pending"
-          />
-        </View>
+        <CompanyComponent
+          name={item.name}
+          type="Car dealership"
+          income="$ 0.00"
+          iconName="car"
+          iconColor="blue"
+          status="Pending"
+          onPress={() => router.push(`/business/ownedBusiness/${item.name}`)}
+        />
       )}
       keyExtractor={(item) => item.id}
     />
