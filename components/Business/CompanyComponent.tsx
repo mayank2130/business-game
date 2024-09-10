@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "flex-start",
     backgroundColor: "white",
-    borderRadius: 8,
+    borderRadius: 10,
     padding: 12,
     marginBottom: 10,
   },

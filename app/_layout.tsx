@@ -1,3 +1,4 @@
+import { BusinessProvider } from "@/lib/context";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -46,9 +47,12 @@ export default function RootLayout() {
 function RootLayoutNav() {
 
   return (
+    <BusinessProvider>
+
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: "modal" }} />
       </Stack>
+    </BusinessProvider>
   );
 }
