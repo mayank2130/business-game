@@ -24,7 +24,7 @@ export interface CompanyProps {
   iconName: MaterialCommunityIconName;
   iconColor: string;
   status?: string;
-  onPress:() => void;
+  onPress: () => void;
 }
 
 const HomeScreen = () => {
@@ -33,7 +33,7 @@ const HomeScreen = () => {
   const router = useRouter();
   return (
     <>
-      <View style={styles.container}>
+      <ScrollView style={styles.container}>
         <View style={styles.incomeCard}>
           <Text style={styles.incomeAmount}>$ {balance.toLocaleString()}</Text>
           <Text style={styles.incomeDescription}>Total income per hour</Text>
@@ -52,8 +52,8 @@ const HomeScreen = () => {
         </View>
 
         <Text style={styles.sectionTitle}>My companies</Text>
-        <OwnedBusiness />
-      </View>
+          <OwnedBusiness />
+      </ScrollView>
     </>
   );
 };

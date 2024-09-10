@@ -127,7 +127,8 @@ const styles = StyleSheet.create({
   companyIncome: {
     alignItems: "flex-end",
     flexDirection: "row",
-    columnGap: 22,
+    columnGap: 28,
+    marginLeft: 12,
   },
   incomeText: {
     fontWeight: "bold",

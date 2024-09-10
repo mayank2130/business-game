@@ -1,5 +1,5 @@
 import React from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useBusinessContext } from "@/lib/context";
 import CompanyComponent from "./CompanyComponent";
 import { useRouter } from "expo-router";
@@ -16,21 +16,21 @@ const OwnedBusiness = () => {
   }
 
   return (
-    <FlatList
-      data={ownedBusinesses}
-      renderItem={({ item }) => (
-        <CompanyComponent
-          name={item.name}
-          type="Car dealership"
-          income="$ 0.00"
-          iconName="car"
-          iconColor="blue"
-          status="Pending"
-          onPress={() => router.push(`/business/ownedBusiness/${item.name}`)}
-        />
-      )}
-      keyExtractor={(item) => item.id}
-    />
+    <ScrollView style={{marginBottom: 40}}>
+      {ownedBusinesses.map((item) => (
+        <View key={item.name}>
+          <CompanyComponent
+            name={item.name}
+            type="Car dealership"
+            income="$ 0.00"
+            iconName="car"
+            iconColor="blue"
+            status="Pending"
+            onPress={() => router.push(`/business/ownedBusiness/${item.name}`)}
+          />
+        </View>
+      ))}
+    </ScrollView>
   );
 };
 
