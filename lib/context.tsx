@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { BusinessOptions } from '@/constants/Business';
 
 export const BALANCE_KEY = "@game_balance";
 export const BUSINESSES_KEY = "@game_businesses";
@@ -12,16 +13,16 @@ interface Business {
 
 interface BusinessContextType {
   balance: number;
-  ownedBusinesses: Business[];
+  ownedBusinesses: BusinessOptions[];
   updateBalance: (newBalance: number) => Promise<void>;
-  updateBusinesses: (newBusinesses: Business[]) => Promise<void>;
+  updateBusinesses: (newBusinesses: BusinessOptions[]) => Promise<void>;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(undefined);
 
 export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [balance, setBalance] = useState<number>(0);
-  const [ownedBusinesses, setOwnedBusinesses] = useState<Business[]>([]);
+  const [ownedBusinesses, setOwnedBusinesses] = useState<BusinessOptions[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -53,7 +54,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  const updateBusinesses = async (newBusinesses: Business[]) => {
+  const updateBusinesses = async (newBusinesses: BusinessOptions[]) => {
     try {
       await AsyncStorage.setItem(BUSINESSES_KEY, JSON.stringify(newBusinesses));
       setOwnedBusinesses(newBusinesses);
