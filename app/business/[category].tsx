@@ -1,52 +1,50 @@
-import React, { useState, useEffect, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import {
-  StyleSheet,
-  Text,
   View,
-  FlatList,
-  TextInput,
+  Text,
   TouchableOpacity,
+  TextInput,
+  FlatList,
   Alert,
+  StyleSheet,
+  ImageSourcePropType,
 } from "react-native";
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useNavigation, useLocalSearchParams, useRouter } from "expo-router";
+import { useBusinessContext } from "@/lib/context"; // Adjust the import path as needed
 import {
-  createBusinessTypes,
-  CreateBusinessTypes,
   BusinessOptions,
-} from "@/constants/Business";
-import { BALANCE_KEY, BUSINESSES_KEY } from "@/components/global/Business";
-import { useBusinessContext } from "@/lib/context";
-
-interface Business extends BusinessOptions {
-  name: string;
-}
+  OptionLevels,
+  createBusinessTypes,
+} from "@/constants/Business"; // Adjust the import path as needed
 
 const BusinessOption: React.FC = () => {
   const { category } = useLocalSearchParams<{ category: string }>();
-
   const navigation = useNavigation();
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerTitle: "",
-      // headerTransparent: true,
-    });
-  }, []);
-
   const router = useRouter();
-  const {balance, ownedBusinesses, updateBalance, updateBusinesses} = useBusinessContext();
+  const { balance, ownedBusinesses, updateBalance, updateBusinesses } =
+    useBusinessContext();
 
   const [newBusinessName, setNewBusinessName] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<BusinessOptions | null>(
     null
   );
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "",
+    });
+  }, []);
+
   const businessType = createBusinessTypes.find(
     (type) => type.value === category
   );
 
   const buyBusiness = () => {
-    if (!selectedOption || !newBusinessName || balance < selectedOption.price) {
+    if (
+      !selectedOption ||
+      !newBusinessName ||
+      balance < selectedOption.levels[0].price
+    ) {
       Alert.alert(
         "Error",
         "Please select an option, enter a business name, and ensure you have sufficient balance."
@@ -54,12 +52,14 @@ const BusinessOption: React.FC = () => {
       return;
     }
 
-    const newBusiness: Business = {
+    const newBusiness = {
       ...selectedOption,
       name: newBusinessName,
+      currentLevel: 1,
+      currentIncome: selectedOption.levels[0].totalIncome,
     };
 
-    updateBalance(balance - selectedOption.price);
+    updateBalance(balance - selectedOption.levels[0].price);
     updateBusinesses([...ownedBusinesses, newBusiness]);
     Alert.alert("Success", `You've purchased ${newBusinessName}!`);
     setNewBusinessName("");
@@ -75,8 +75,13 @@ const BusinessOption: React.FC = () => {
       ]}
       onPress={() => setSelectedOption(item)}
     >
-      <Text style={styles.optionName}>{item.name}</Text>
-      <Text style={styles.optionPrice}>${item.price.toLocaleString()}</Text>
+      <Text style={styles.optionName}>{item.value}</Text>
+      <Text style={styles.optionPrice}>
+        Initial Cost: ${item.levels[0].price.toLocaleString()}
+      </Text>
+      <Text style={styles.optionIncome}>
+        Initial Income: ${item.levels[0].totalIncome.toLocaleString()}/day
+      </Text>
     </TouchableOpacity>
   );
 
@@ -114,11 +119,17 @@ const BusinessOption: React.FC = () => {
   );
 };
 
+export default BusinessOption;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
     backgroundColor: "#f5f5f5",
+  },
+  optionIncome: {
+    fontSize: 14,
+    color: "#4CAF50",
   },
   title: {
     fontSize: 24,
@@ -177,5 +188,3 @@ const styles = StyleSheet.create({
     color: "red",
   },
 });
-
-export default BusinessOption;
