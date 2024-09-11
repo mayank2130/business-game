@@ -26,7 +26,7 @@ const OwnedBusiness = () => {
             iconName="car"
             iconColor="blue"
             status="Pending"
-            onPress={() => router.push(`/business/ownedBusiness/${item.name}`)}
+            onPress={() => router.push(`/business/ownedBusiness/${item.value}`)}
           />
         </View>
       ))}
