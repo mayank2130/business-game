@@ -1,11 +1,15 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Alert, StyleSheet, Text, View } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import BusinessInfo from "@/components/Business/BusinessInfo";
+import { BusinessOptions } from "@/constants/Business";
+import { useBusinessContext } from "@/lib/context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const companyInfo = () => {
   const { companyInfo } = useLocalSearchParams();
-
+  const { balance, updateBalance, updateBusinesses, ownedBusinesses } =
+    useBusinessContext();
   const navigation = useNavigation();
 
   useLayoutEffect(() => {
@@ -16,15 +20,19 @@ const companyInfo = () => {
   }, []);
 
   return (
-    <View>
-      <BusinessInfo 
-        // incomePerHour={102.06}
-        // stage={1}
-        // requiredInvestment={1469.7}
-        // expectedProfitGrowth={35.72}
-        // balance="22,674,053,319,711,100.00"
-      />
-    </View>
+    <SafeAreaView>
+      <Text>{companyInfo}</Text>
+      {/* {ownedBusinesses.map(business => (
+        <BusinessItem
+          key={business.id}
+          business={business}
+          balance={balance}
+          updateBalance={updateBalance}
+          updateBusinesses={updateBusinesses}
+          ownedBusinesses={ownedBusinesses}
+        />
+      ))} */}
+    </SafeAreaView>
   );
 };
 

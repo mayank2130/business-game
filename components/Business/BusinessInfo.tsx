@@ -9,8 +9,12 @@ import {
   Pressable,
   ScrollView,
   ImageBackground,
+  Button,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useBusinessContext } from "@/lib/context";
+import { BusinessOptions } from "@/constants/Business";
 
 interface LocalShopProps {
   incomePerHour: number;
@@ -29,59 +33,93 @@ const BusinessInfo: React.FC = (
     //   balance,
   }
 ) => {
+  const { balance, updateBalance, updateBusinesses, ownedBusinesses } =
+    useBusinessContext();
+  const increaseBusinessLevel = (
+    business: BusinessOptions & { currentLevel: number; currentIncome: number }
+  ) => {
+    const nextLevel = business.currentLevel + 1;
+    if (nextLevel > 8) {
+      Alert.alert("Error", "This business is already at maximum level.");
+      return;
+    }
+
+    const upgradeCost = business.levels[nextLevel - 1].price;
+    if (balance < upgradeCost) {
+      Alert.alert("Error", "Insufficient balance to upgrade this business.");
+      return;
+    }
+
+    const updatedBusiness = {
+      ...business,
+      currentLevel: nextLevel,
+      currentIncome: business.levels[nextLevel - 1].totalIncome,
+    };
+
+    const updatedBusinesses = ownedBusinesses.map((b) =>
+      b.name === business.name ? updatedBusiness : b
+    );
+
+    updateBalance(balance - upgradeCost);
+    updateBusinesses(updatedBusinesses);
+    Alert.alert("Success", `${business.name} upgraded to level ${nextLevel}!`);
+  };
+
+
   return (
-      <ScrollView>
-        <View
-          style={{
-            paddingTop: 160,
-            backgroundColor: "#333C4B",
-            position: "relative",
-          }}
-        >
-          <View style={[styles.containerTwo]}>
-            <View
-              style={[
-                styles.cardThree,
-                styles.cardElevated,
-                {
-                  position: "absolute",
-                  top: -80,
-                  // left: "auto",
-                  bottom: 0,
-                  alignItems: "center",
-                  justifyContent: "center",
-                },
-              ]}
-            >
-              <ImageBackground
-                source={require("../../assets/images/bank.png")}
-                style={{
-                  height: 60,
-                  width: 60,
-                  borderRadius: 25,
-                  margin: 6,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              ></ImageBackground>
-              <Text style={styles.innerTxt}>Investment Bank</Text>
-            </View>
+    <ScrollView>
+      <View
+        style={{
+          paddingTop: 160,
+          backgroundColor: "#333C4B",
+          position: "relative",
+        }}
+      >
+        <View style={[styles.containerTwo]}>
+          <View
+            style={[
+              styles.cardThree,
+              styles.cardElevated,
+              {
+                position: "absolute",
+                top: -80,
+                // left: "auto",
+                bottom: 0,
+                alignItems: "center",
+                justifyContent: "center",
+              },
+            ]}
+          >
+            <ImageBackground
+              source={require("../../assets/images/bank.png")}
+              style={{
+                height: 60,
+                width: 60,
+                borderRadius: 25,
+                margin: 6,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            ></ImageBackground>
+            <Text style={styles.innerTxt}>Investment Bank</Text>
           </View>
         </View>
-        <View style={[styles.containerThree, { marginTop: 150 }]}>
-          <View style={styles.containerThree}>
-            <Text
-              style={[
-                styles.overlayText,
-                { letterSpacing: 1, fontFamily: "mon-l" },
-              ]}
-            >
-              Bank calculates the risk of giving you a loan and sets the
-              interest rate accordingly.
-            </Text>
-          </View>
+      </View>
+      <View style={[styles.containerThree, { marginTop: 150 }]}>
+        <View style={styles.containerThree}>
+          <Text
+            style={[
+              styles.overlayText,
+              { letterSpacing: 1, fontFamily: "mon-l" },
+            ]}
+          >
+            Bank calculates the risk of giving you a loan and sets the interest
+            rate accordingly.
+          </Text>
         </View>
-      </ScrollView>
+        <Button onPress={increaseBusinessLevel}>Upgrade</Button>
+      </View>
+    </ScrollView>
   );
 };
 
