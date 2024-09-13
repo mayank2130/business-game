@@ -36,7 +36,7 @@ export default function BusinessCategories() {
                   <View key={index} style={styles.containerTwo}>
                     <TouchableOpacity
                       onPress={() =>
-                        router.push(`/business/${businessType.value}`)
+                        router.push(`/business/category/${businessType.value}`)
                       }
                     >
                       <View
@@ -63,7 +63,7 @@ export default function BusinessCategories() {
 
                     {index + 1 < createBusinessTypes.length && (
                       <TouchableOpacity
-                        onPress={() => router.push(`/business/${createBusinessTypes[index + 1].value}`)}
+                        onPress={() => router.push(`/business/category/${createBusinessTypes[index + 1].value}`)}
                       >
                         <View
                           style={[

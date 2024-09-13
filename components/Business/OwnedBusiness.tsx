@@ -16,7 +16,7 @@ const OwnedBusiness = () => {
   }
 
   return (
-    <ScrollView style={{marginBottom: 40}}>
+    <ScrollView style={{ marginBottom: 40 }}>
       {ownedBusinesses.map((item) => (
         <View key={item.name}>
           <CompanyComponent
@@ -26,7 +26,10 @@ const OwnedBusiness = () => {
             iconName="car"
             iconColor="blue"
             status="Pending"
-            onPress={() => router.push(`/business/ownedBusiness/${item.value}`)}
+            onPress={() => router.push({
+              pathname: "/business/ownedBusiness/[id]",
+              params: { data: JSON.stringify(item) }
+            })}
           />
         </View>
       ))}
