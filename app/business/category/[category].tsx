@@ -10,12 +10,12 @@ import {
   ImageSourcePropType,
 } from "react-native";
 import { useNavigation, useLocalSearchParams, useRouter } from "expo-router";
-import { useBusinessContext } from "@/lib/context"; // Adjust the import path as needed
+import { useBusinessContext } from "@/lib/context";
 import {
   BusinessOptions,
   OptionLevels,
   createBusinessTypes,
-} from "@/constants/Business"; // Adjust the import path as needed
+} from "@/constants/Business";
 
 const BusinessOption: React.FC = () => {
   const { category } = useLocalSearchParams<{ category: string }>();

@@ -48,10 +48,10 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useLocalSearchParams, useNavigation } from "expo-router";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import { BusinessOptions } from "@/constants/Business";
 
-const SalesDashboard: React.FC = () => {
+const CompanyInfo: React.FC = () => {
   const params = useLocalSearchParams();
 
   const businessData: BusinessOptions = params.data
@@ -73,6 +73,8 @@ const SalesDashboard: React.FC = () => {
     });
   }, []);
 
+  const router = useRouter();
+
   return (
     <>
       <LinearGradient
@@ -80,18 +82,18 @@ const SalesDashboard: React.FC = () => {
         style={{ padding: 20, paddingBottom: 24, paddingTop: 16 }}
       >
         <View style={styles.header}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
           {/* <Ionicons name="basket-outline" size={24} color="black" /> */}
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="settings-outline" size={24} color="black" />
           </TouchableOpacity>
         </View>
 
         <View style={styles.incomeCard}>
           <Text style={styles.incomeAmount}>
-            $ {businessData.levels[0].totalIncome}
+            $ {businessData.levels[0].totalIncome.toLocaleString()}
           </Text>
           <Text style={styles.incomeLabel}>Income per hour</Text>
         </View>
@@ -103,7 +105,7 @@ const SalesDashboard: React.FC = () => {
             <Text style={styles.statLabel}>Stage</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.categoryLabel}>Local shop</Text>
+            <Text style={styles.categoryLabel}>{businessData.value}</Text>
             <Text style={styles.categorySubLabel}>Category</Text>
           </View>
         </View>
@@ -113,9 +115,13 @@ const SalesDashboard: React.FC = () => {
           <Text style={styles.salesOutletTitle}>
             Opening of new sales outlets
           </Text>
-          <Text style={styles.investmentAmount}>$ 1,469.70</Text>
+          <Text style={styles.investmentAmount}>
+            $ {businessData.levels[0].price.toLocaleString()}
+          </Text>
           <Text style={styles.investmentLabel}>Required Investments</Text>
-          <Text style={styles.profitGrowth}>↑ $ 35.72</Text>
+          <Text style={styles.profitGrowth}>
+            ↑ $ {businessData.levels[0].growth.toLocaleString()}
+          </Text>
           <Text style={styles.profitGrowthLabel}>Expected profit growth</Text>
         </View>
 
@@ -228,4 +234,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SalesDashboard;
+export default CompanyInfo;
