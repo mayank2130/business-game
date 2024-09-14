@@ -22,14 +22,16 @@ const OwnedBusiness = () => {
           <CompanyComponent
             name={item.name}
             type="Car dealership"
-            income="$ 0.00"
+            income={`$ ${item.levels[0].growth.toLocaleString()}`}
             iconName="car"
             iconColor="blue"
             status="Pending"
-            onPress={() => router.push({
-              pathname: "/business/ownedBusiness/[id]",
-              params: { data: JSON.stringify(item) }
-            })}
+            onPress={() =>
+              router.push({
+                pathname: "/business/ownedBusiness/[id]",
+                params: { data: JSON.stringify(item) },
+              })
+            }
           />
         </View>
       ))}
