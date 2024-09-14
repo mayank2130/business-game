@@ -23,7 +23,7 @@ const OwnedBusiness = () => {
             name={item.name}
             type={item.value}
             income={`$ ${getCurrentIncome(item.id).toLocaleString()}`}
-            iconName="car"
+            iconName={item.icon ? item.icon : "office-building"}
             iconColor="blue"
             status="Pending"
             onPress={() =>

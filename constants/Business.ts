@@ -11,6 +11,7 @@ export interface CreateBusinessTypes {
 
 export interface BusinessOptions {
   id: string;
+  icon: MaterialCommunityIconName;
   value: string;
   name: string;
   currentLevel: number;
@@ -48,6 +49,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "cart",
         currentLevel: 0,
         currentIncome: 0,
         value: "Local Shop",
@@ -65,6 +67,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "cart",
         currentLevel: 0,
         currentIncome: 0,
         value: "A Small Chain of Shops",
@@ -82,6 +85,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "cart",
         currentLevel: 0,
         currentIncome: 0,
         value: "Large Chain of Shops",
@@ -107,6 +111,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "factory",
         currentLevel: 0,
         currentIncome: 0,
         value: "Small Factory",
@@ -124,6 +129,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "factory",
         currentLevel: 0,
         currentIncome: 0,
         value: "Mid-Size Factory",
@@ -141,6 +147,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "factory",
         currentLevel: 0,
         currentIncome: 0,
         value: "Large Factory",
@@ -165,6 +172,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "shovel",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -182,6 +190,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "shovel",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -199,6 +208,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "shovel",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -224,6 +234,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "pistol",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -241,6 +252,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "pistol",
         name: "",
         currentLevel: 0,
         currentIncome: 0,
@@ -258,6 +270,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "pistol",
         name: "",
         currentLevel: 0,
         currentIncome: 0,
@@ -283,6 +296,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "bank-outline",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -300,6 +314,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "bank-outline",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -317,6 +332,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "bank-outline",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -343,6 +359,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       {
         id: "1",
         currentLevel: 0,
+        icon: "code-tags",
         currentIncome: 0,
         name: "",
         levels: [
@@ -359,6 +376,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "code-tags",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -376,6 +394,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "code-tags",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -401,6 +420,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "gas-station",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -418,6 +438,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "gas-station",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -435,6 +456,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "gas-station",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -460,6 +482,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "solar-power",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -477,6 +500,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "solar-power",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -494,6 +518,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "solar-power",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -519,6 +544,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "pill",
         name: "",
         currentLevel: 0,
         currentIncome: 0,
@@ -536,6 +562,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "pill",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -553,6 +580,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "pill",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -578,6 +606,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        icon: "bomb",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -595,6 +624,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        icon: "bomb",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
@@ -612,6 +642,7 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        icon: "bomb",
         currentLevel: 0,
         currentIncome: 0,
         name: "",
