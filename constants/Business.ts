@@ -1,4 +1,5 @@
 import { ImageSourcePropType } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 export interface CreateBusinessTypes {
   id: string;
@@ -20,6 +21,20 @@ export interface OptionLevels {
   price: number;
   growth: number;
   totalIncome: number;
+}
+
+type MaterialCommunityIconName = React.ComponentProps<
+  typeof MaterialCommunityIcons
+>["name"];
+
+export interface CompanyProps {
+  name: string;
+  type: string;
+  income: string;
+  iconName: MaterialCommunityIconName;
+  iconColor: string;
+  status?: string;
+  onPress: () => void;
 }
 
 export const createBusinessTypes: CreateBusinessTypes[] = [

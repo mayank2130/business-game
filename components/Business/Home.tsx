@@ -7,25 +7,12 @@ import {
   ScrollView,
   FlatList,
 } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+
 import { useRouter } from "expo-router";
 import { fetchBusinesses } from "@/lib/storage";
 import OwnedBusiness from "./OwnedBusiness";
 import { useBusinessContext } from "@/lib/context";
 
-type MaterialCommunityIconName = React.ComponentProps<
-  typeof MaterialCommunityIcons
->["name"];
-
-export interface CompanyProps {
-  name: string;
-  type: string;
-  income: string;
-  iconName: MaterialCommunityIconName;
-  iconColor: string;
-  status?: string;
-  onPress: () => void;
-}
 
 const HomeScreen = () => {
   const { balance } = useBusinessContext();

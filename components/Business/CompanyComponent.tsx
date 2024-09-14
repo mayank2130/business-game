@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { CompanyProps } from "./Home";
+import { CompanyProps } from "@/constants/Business";
 
 export const CompanyComponent: React.FC<CompanyProps> = ({
   name,
