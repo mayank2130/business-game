@@ -5,7 +5,7 @@ import CompanyComponent from "./CompanyComponent";
 import { useRouter } from "expo-router";
 
 const OwnedBusiness = () => {
-  const { ownedBusinesses } = useBusinessContext();
+  const { ownedBusinesses, getCurrentIncome } = useBusinessContext();
   const router = useRouter();
   if (ownedBusinesses.length === 0) {
     return (
@@ -18,11 +18,11 @@ const OwnedBusiness = () => {
   return (
     <ScrollView style={{ marginBottom: 40 }}>
       {ownedBusinesses.map((item) => (
-        <View key={item.name}>
+        <View key={`${item.id}-${item.name}-${item.value}`}>
           <CompanyComponent
             name={item.name}
-            type="Car dealership"
-            income={`$ ${item.levels[0].growth.toLocaleString()}`}
+            type={item.value}
+            income={`$ ${getCurrentIncome(item.id).toLocaleString()}`}
             iconName="car"
             iconColor="blue"
             status="Pending"

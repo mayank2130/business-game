@@ -38,27 +38,47 @@
 
 // export default CompanyInfo;
 
-import React, { useLayoutEffect } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import { BusinessOptions } from "@/constants/Business";
+import { BusinessOptions, OptionLevels } from "@/constants/Business";
+import { useBusinessContext } from "@/lib/context";
 
 const CompanyInfo: React.FC = () => {
   const params = useLocalSearchParams();
+  const navigation = useNavigation();
+  const router = useRouter();
+  const { balance, ownedBusinesses, increaseBusinessLevel, getCurrentIncome } = useBusinessContext();
 
-  const businessData: BusinessOptions = params.data
-    ? JSON.parse(params.data as string)
-    : null;
+  const [business, setBusiness] = useState<BusinessOptions | null>(null);
 
-  if (!businessData) {
+  useEffect(() => {
+    if (params.data) {
+      try {
+        const parsedBusiness: BusinessOptions = JSON.parse(params.data as string);
+        setBusiness(parsedBusiness);
+      } catch (error) {
+        console.error("Error parsing business data:", error);
+      }
+    }
+  }, [params.data]);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, []);
+
+  if (!business) {
     return (
       <SafeAreaView>
         <Text>Error: Could not load business information.</Text>
@@ -66,14 +86,9 @@ const CompanyInfo: React.FC = () => {
     );
   }
 
-  const navigation = useNavigation();
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, []);
-
-  const router = useRouter();
+  const currentIncome = getCurrentIncome(business.id);
+  const currentLevel = business.currentLevel || 1;
+  const nextLevelData: OptionLevels | undefined = business.levels[currentLevel];
 
   return (
     <>
@@ -85,7 +100,6 @@ const CompanyInfo: React.FC = () => {
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
-          {/* <Ionicons name="basket-outline" size={24} color="black" /> */}
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="settings-outline" size={24} color="black" />
           </TouchableOpacity>
@@ -93,45 +107,55 @@ const CompanyInfo: React.FC = () => {
 
         <View style={styles.incomeCard}>
           <Text style={styles.incomeAmount}>
-            $ {businessData.levels[0].totalIncome.toLocaleString()}
+            $ {currentIncome.toLocaleString()}
           </Text>
           <Text style={styles.incomeLabel}>Income per hour</Text>
         </View>
       </LinearGradient>
       <View style={styles.container}>
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>1</Text>
+          <View style={[styles.statCard, { maxWidth: 120 }]}>
+            <Text style={styles.statNumber}>{currentLevel}</Text>
             <Text style={styles.statLabel}>Stage</Text>
           </View>
           <View style={styles.statCard}>
-            <Text style={styles.categoryLabel}>{businessData.value}</Text>
+            <Text style={styles.categoryLabel}>{business.name}</Text>
             <Text style={styles.categorySubLabel}>Category</Text>
           </View>
         </View>
 
-        <View style={styles.salesOutletCard}>
-          <Ionicons name="storefront-outline" size={24} color="black" />
-          <Text style={styles.salesOutletTitle}>
-            Opening of new sales outlets
-          </Text>
-          <Text style={styles.investmentAmount}>
-            $ {businessData.levels[0].price.toLocaleString()}
-          </Text>
-          <Text style={styles.investmentLabel}>Required Investments</Text>
-          <Text style={styles.profitGrowth}>
-            ↑ $ {businessData.levels[0].growth.toLocaleString()}
-          </Text>
-          <Text style={styles.profitGrowthLabel}>Expected profit growth</Text>
-        </View>
+        {nextLevelData && (
+          <View style={styles.salesOutletCard}>
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              <Ionicons name="storefront-outline" size={24} color="black" />
+              <Text style={styles.salesOutletTitle}>
+                Opening of new sales outlets
+              </Text>
+            </View>
+            <Text style={styles.investmentAmount}>
+              $ {nextLevelData.price.toLocaleString()}
+            </Text>
+            <Text style={styles.investmentLabel}>Required Investments</Text>
+            <Text style={styles.profitGrowth}>
+              ↑ $ {nextLevelData.growth.toLocaleString()}
+            </Text>
+            <Text style={styles.profitGrowthLabel}>Expected profit growth</Text>
+          </View>
+        )}
 
-        <TouchableOpacity style={styles.openButton}>
-          <Text style={styles.openButtonText}>Open new outlets</Text>
+        <TouchableOpacity
+          onPress={() => increaseBusinessLevel(business.id)}
+          style={styles.openButton}
+          disabled={!nextLevelData}
+        >
+          <Text style={styles.openButtonText}>
+            {nextLevelData ? "Open new outlets" : "Maximum level reached"}
+          </Text>
         </TouchableOpacity>
 
-        {/* <Text style={styles.balanceText}>
-          Balance: $ 22,674,053,319,711,100.00
-        </Text> */}
+        <Text style={styles.balanceText}>
+          Balance: $ {balance.toLocaleString()}
+        </Text>
       </View>
     </>
   );
@@ -165,7 +189,7 @@ const styles = StyleSheet.create({
   },
   statsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    // justifyContent: "space-between",
     marginBottom: 20,
   },
   statCard: {
