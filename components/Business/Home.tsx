@@ -13,16 +13,15 @@ import { fetchBusinesses } from "@/lib/storage";
 import OwnedBusiness from "./OwnedBusiness";
 import { useBusinessContext } from "@/lib/context";
 
-
 const HomeScreen = () => {
-  const { balance } = useBusinessContext();
-
+  const { balance, getTotalIncome } = useBusinessContext();
+  const totalIncome = getTotalIncome();
   const router = useRouter();
   return (
     <>
       <ScrollView style={styles.container}>
         <View style={styles.incomeCard}>
-          <Text style={styles.incomeAmount}>$ {balance.toLocaleString()}</Text>
+          <Text style={styles.incomeAmount}>$ {totalIncome.toLocaleString()}</Text>
           <Text style={styles.incomeDescription}>Total income per hour</Text>
         </View>
 
@@ -39,7 +38,7 @@ const HomeScreen = () => {
         </View>
 
         <Text style={styles.sectionTitle}>My companies</Text>
-          <OwnedBusiness />
+        <OwnedBusiness />
       </ScrollView>
     </>
   );

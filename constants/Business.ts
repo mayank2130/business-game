@@ -13,6 +13,8 @@ export interface BusinessOptions {
   id: string;
   value: string;
   name: string;
+  currentLevel: number;
+  currentIncome: number;
   levels: OptionLevels[];
 }
 
@@ -46,6 +48,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         value: "Local Shop",
         name: "",
         levels: [
@@ -61,6 +65,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         value: "A Small Chain of Shops",
         name: "",
         levels: [
@@ -76,6 +82,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         value: "Large Chain of Shops",
         name: "",
         levels: [
@@ -99,6 +107,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         value: "Small Factory",
         name: "",
         levels: [
@@ -114,6 +124,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         value: "Mid-Size Factory",
         name: "",
         levels: [
@@ -129,6 +141,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         value: "Large Factory",
         name: "",
         levels: [
@@ -151,6 +165,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -166,6 +182,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -181,6 +199,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -204,6 +224,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -220,6 +242,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       {
         id: "2",
         name: "",
+        currentLevel: 0,
+        currentIncome: 0,
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
           { level: 2, price: 7500000, growth: 150000, totalIncome: 650000 },
@@ -235,6 +259,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       {
         id: "3",
         name: "",
+        currentLevel: 0,
+        currentIncome: 0,
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
           { level: 2, price: 7500000, growth: 150000, totalIncome: 650000 },
@@ -257,6 +283,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -272,6 +300,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -287,6 +317,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -310,6 +342,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -325,6 +359,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -340,6 +376,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -363,6 +401,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -378,6 +418,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -393,6 +435,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -416,6 +460,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -431,6 +477,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -446,6 +494,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -470,6 +520,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       {
         id: "1",
         name: "",
+        currentLevel: 0,
+        currentIncome: 0,
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
           { level: 2, price: 7500000, growth: 150000, totalIncome: 650000 },
@@ -484,6 +536,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -499,6 +553,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -522,6 +578,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
     options: [
       {
         id: "1",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -537,6 +595,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "2",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
@@ -552,6 +612,8 @@ export const createBusinessTypes: CreateBusinessTypes[] = [
       },
       {
         id: "3",
+        currentLevel: 0,
+        currentIncome: 0,
         name: "",
         levels: [
           { level: 1, price: 5000000, growth: 100000, totalIncome: 500000 },
