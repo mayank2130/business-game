@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import React from "react";
-// import { LinearGradient } from "expo-linear-gradient";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function ElevatedCards() {
   function openWebsite(websiteLink: string) {
@@ -114,12 +114,12 @@ export default function ElevatedCards() {
           <View style={{ marginTop: 10 }}>
             <Text style={styles.headingTextTwo}>Your Travel</Text>
             <View style={styles.container}>
-              {/* <LinearGradient
+              <LinearGradient
                 colors={["#00CCFF", "#007BA7"]}
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.gradient}
-              > */}
+              >
               <View style={[styles.container]}>
                 <View style={[styles.cardTwo]}>
                   <TouchableOpacity style={styles.innerCard}>
@@ -133,7 +133,7 @@ export default function ElevatedCards() {
                   </TouchableOpacity>
                 </View>
               </View>
-              {/* </LinearGradient> */}
+              </LinearGradient>
             </View>
           </View>
 
@@ -141,12 +141,12 @@ export default function ElevatedCards() {
           <View style={{ marginTop: 30 }}>
             <Text style={styles.headingTextTwo}>Your Fashion</Text>
             <View style={[styles.container]}>
-              {/* <LinearGradient
+              <LinearGradient
                 colors={["#00CCFF", "#007BA7"]}
                 start={{ x: 0, y: 1 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.gradient}
-              > */}
+              >
               <View style={[styles.container]}>
                 <View style={styles.cardTwo}>
                   <TouchableOpacity style={styles.innerCard}>
@@ -168,7 +168,7 @@ export default function ElevatedCards() {
                   </TouchableOpacity>
                 </View>
               </View>
-              {/* </LinearGradient> */}
+              </LinearGradient>
             </View>
           </View>
           <View>
