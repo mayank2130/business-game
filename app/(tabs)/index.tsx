@@ -4,7 +4,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { useBusinessContext } from "@/lib/context";
 
 const App = () => {
-  const { balance, updateBalance } = useBusinessContext();
+  const { balance, updateBalance, influence } = useBusinessContext();
 
   return (
     <>
@@ -23,7 +23,10 @@ const App = () => {
                 </View>
               </View>
               <Text style={styles.headingTxt}>Balance:</Text>
-              <Text style={[styles.balanceTxt]}> $ {balance.toLocaleString()}</Text>
+              <Text style={[styles.balanceTxt]}>
+                {" "}
+                $ {balance.toLocaleString()}
+              </Text>
             </View>
           </View>
           <View style={styles.containerInTwo}>
@@ -40,6 +43,7 @@ const App = () => {
         <Text style={{ fontFamily: "mon", marginTop: 5 }}>
           Click in this area to make money
         </Text>
+        <Text>Influence: {influence}</Text>
       </TouchableOpacity>
     </>
   );

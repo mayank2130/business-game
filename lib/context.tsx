@@ -5,6 +5,7 @@ import { Alert } from "react-native";
 
 export const BALANCE_KEY = "@game_balance";
 export const BUSINESSES_KEY = "@game_businesses";
+export const INFLUENCE_KEY = "@game_influence";
 
 interface Business {
   id: string;
@@ -14,12 +15,17 @@ interface Business {
 
 interface BusinessContextType {
   balance: number;
+  influence: number;
   ownedBusinesses: BusinessOptions[];
   updateBalance: (newBalance: number) => Promise<void>;
   updateBusinesses: (newBusinesses: BusinessOptions[]) => Promise<void>;
   increaseBusinessLevel: (businessId: string) => Promise<void>;
   getCurrentIncome: (businessId: string) => number;
   getTotalIncome: () => number;
+  increaseInfluence: (
+    influenceCost: number,
+    influenceAmount: number
+  ) => Promise<void>;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(
@@ -31,12 +37,14 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [balance, setBalance] = useState<number>(0);
   const [ownedBusinesses, setOwnedBusinesses] = useState<BusinessOptions[]>([]);
+  const [influence, setInfluence] = useState<number>(0);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const storedBalance = await AsyncStorage.getItem(BALANCE_KEY);
         const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
+        const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
 
         if (storedBalance !== null) {
           setBalance(parseFloat(storedBalance));
@@ -44,6 +52,10 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
         if (storedBusinesses !== null) {
           setOwnedBusinesses(JSON.parse(storedBusinesses));
+        }
+
+        if (storedInfluence !== null) {
+          setInfluence(parseFloat(storedInfluence));
         }
       } catch (error) {
         console.error("Error loading data:", error);
@@ -129,16 +141,43 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
+  const increaseInfluence = async (
+    influenceCost: number,
+    influenceAmount: number
+  ) => {
+    try {
+      if (balance < influenceCost) {
+        Alert.alert("Error", "Insufficient balance to increase influence.");
+        return;
+      }
+
+      const newInfluence = influence + influenceAmount;
+      const newBalance = balance - influenceCost;
+
+      await AsyncStorage.setItem(INFLUENCE_KEY, newInfluence.toString());
+      await AsyncStorage.setItem(BALANCE_KEY, newBalance.toString());
+
+      setInfluence(newInfluence);
+      setBalance(newBalance);
+
+      Alert.alert("Success", `${influenceAmount} Influence increased`);
+    } catch (error) {
+      console.error("Error updating influence:", error);
+    }
+  };
+
   return (
     <BusinessContext.Provider
       value={{
         balance,
+        influence,
         ownedBusinesses,
         updateBalance,
         updateBusinesses,
         increaseBusinessLevel,
         getCurrentIncome,
         getTotalIncome,
+        increaseInfluence,
       }}
     >
       {children}
