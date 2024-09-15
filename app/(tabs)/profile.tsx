@@ -39,6 +39,12 @@ const Profile = () => {
       >
         <Text style={styles.openButtonText}>Business Lisences</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.openButton}
+        onPress={() => router.push("/capital/loans")}
+      >
+        <Text style={styles.openButtonText}>Maintainance Cost</Text>
+      </TouchableOpacity>
     </>
   );
 };

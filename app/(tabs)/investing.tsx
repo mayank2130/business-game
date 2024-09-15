@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-// import MyTabs from "../TabsThree";
+import InvestmentTabs from "../InvestmentTabs";
 
 const business = () => {
   return (
@@ -10,7 +10,7 @@ const business = () => {
           Business{" "}
         </Text>
       </View>
-      {/* <MyTabs /> */}
+      <InvestmentTabs />
     </>
   );
 };
