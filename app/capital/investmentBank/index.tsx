@@ -1,3 +1,8 @@
+{
+  /* Build Relations with Bankers to get investment, loans and special
+treatments. Higher the influence, lower the interest you have to pay. */
+}
+
 import {
   Image,
   ImageBackground,
@@ -10,6 +15,7 @@ import {
 } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { router, useNavigation } from "expo-router";
+import { useBusinessContext } from "@/lib/context";
 
 const InvestmentBank = () => {
   const navigation = useNavigation<any>();
@@ -21,38 +27,71 @@ const InvestmentBank = () => {
     });
   }, []);
 
-  const politicianOptions = [
-    {
-      amount: 250000,
-      level: "Regional Level Politician",
-      influence: 5,
-    },
-    {
-      amount: 5000000,
-      level: "State Level Politician",
-      influence: 2,
-    },
-    { amount: 15000000, level: "Prime Minister", influence: 1 },
+  const priceOptions = [
+    { amount: 250000, interest: 5, returnTime: "within 1 month" },
+    { amount: 500000, interest: 7, returnTime: "within 3 months" },
+    { amount: 750000, interest: 8, returnTime: "within 6 months" },
+    { amount: 1000000, interest: 10, returnTime: "within 1 year" },
   ];
 
+  const { getLoan } = useBusinessContext();
   return (
     <>
       <ScrollView style={{ maxHeight: "auto", flex: 1 }}>
-        <View style={[styles.containerThree, { marginTop: 100 }]}>
-          <View style={[styles.containerThree, { marginBottom: 10 }]}>
+        <View
+          style={{
+            paddingTop: 160,
+            backgroundColor: "#333C4B",
+            position: "relative",
+          }}
+        >
+          <View style={[styles.containerTwo]}>
+            <View
+              style={[
+                styles.cardThree,
+                styles.cardElevated,
+                {
+                  position: "absolute",
+                  top: -80,
+                  // left: "auto",
+                  right: 95,
+                  bottom: 0,
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              ]}
+            >
+              <ImageBackground
+                source={require("../../../assets/images/bank.png")}
+                style={{
+                  height: 60,
+                  width: 60,
+                  borderRadius: 25,
+                  margin: 6,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              ></ImageBackground>
+              <Text style={styles.innerTxt}>City Bank</Text>
+            </View>
+          </View>
+        </View>
+        <View style={[styles.containerThree, { marginTop: 150 }]}>
+          <View style={[styles.containerThree, { marginBottom: 20 }]}>
             <Text
               style={[
                 styles.overlayText,
-                { letterSpacing: 1, fontFamily: "mon", padding: 2 },
+                { letterSpacing: 1, fontFamily: "mon-l" },
               ]}
             >
               Build Relations with Bankers to get investment, loans and special
-              treatments. Higher the influence, lower the interest you have to pay.
+              treatments. Higher the influence, lower the interest you have to
+              pay.
             </Text>
           </View>
 
-          {politicianOptions.map((item, index) => (
-            <View style={{ marginTop: 10 }} key={index}>
+          {priceOptions.map((price, index) => (
+            <View style={{ marginTop: 20 }} key={index}>
               <View>
                 <View
                   style={[
@@ -67,7 +106,7 @@ const InvestmentBank = () => {
                   ]}
                 >
                   <Text style={[styles.innerTxt, { color: "green" }]}>
-                    ${item.amount.toLocaleString()}
+                    ${price.amount.toLocaleString()}
                   </Text>
                   <View
                     style={{
@@ -76,28 +115,17 @@ const InvestmentBank = () => {
                       paddingTop: 13,
                     }}
                   >
-                    <Text
-                      style={[
-                        styles.overlayText,
-                        { fontFamily: "mon-sb", fontSize: 18 },
-                      ]}
-                    >
-                      {item.level}
+                    <Text style={styles.overlayText}>
+                      At {price.interest}% interest
                     </Text>
-                    <Text
-                      style={{
-                        fontFamily: "mon",
-                        paddingTop: 5,
-                        color: "green",
-                      }}
-                    >
-                      Influence + {item.influence}
+                    <Text style={{ fontFamily: "mon-l", paddingTop: 5 }}>
+                      Return {price.returnTime}
                     </Text>
                   </View>
                   <View
                     style={{
                       flexDirection: "row",
-                      paddingTop: 10,
+                      paddingTop: 30,
                       alignItems: "center",
                     }}
                   >
@@ -129,7 +157,7 @@ const InvestmentBank = () => {
                         </Pressable>
                       </View>
                       <View style={styles.containerThree}>
-                        <Pressable>
+                        <Pressable onPress={() => getLoan(price)}>
                           <View
                             style={[
                               styles.cardSix,
@@ -199,10 +227,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   cardFour: {
-    height: 200,
+    height: 230,
     width: 340,
     borderRadius: 10,
-    marginVertical: 5,
+    marginVertical: 12,
     marginHorizontal: 10,
   },
   cardImage: {
