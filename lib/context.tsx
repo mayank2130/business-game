@@ -198,11 +198,16 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getLoan = async (loanOption: LoanOption) => {
     try {
-      if (loan) {
-        Alert.alert("Error", "You already have an active loan.");
+      // Skip the loan check if influence is greater than 2
+      if (influence <= 25 && loan) {
+        Alert.alert(
+          "Oops!",
+          "You already have an active loan. Increase influence to take multiple loans."
+        );
         return;
       }
 
+      // Continue if no active loan or influence is greater than 2
       const newLoan: Loan = {
         amount: loanOption.amount,
         interest: loanOption.interest,
@@ -226,29 +231,31 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
   return (
     <BusinessContext.Provider
-    value={{
-      balance,
-      influence,
-      ownedBusinesses,
-      loan,
-      updateBalance,
-      updateBusinesses,
-      increaseBusinessLevel,
-      getCurrentIncome,
-      getTotalIncome,
-      increaseInfluence,
-      getLoan,
-    }}
-  >
-    {children}
-  </BusinessContext.Provider>
-);
+      value={{
+        balance,
+        influence,
+        ownedBusinesses,
+        loan,
+        updateBalance,
+        updateBusinesses,
+        increaseBusinessLevel,
+        getCurrentIncome,
+        getTotalIncome,
+        increaseInfluence,
+        getLoan,
+      }}
+    >
+      {children}
+    </BusinessContext.Provider>
+  );
 };
 
 export const useBusinessContext = () => {
-const context = useContext(BusinessContext);
-if (context === undefined) {
-  throw new Error("useBusinessContext must be used within a BusinessProvider");
-}
-return context;
+  const context = useContext(BusinessContext);
+  if (context === undefined) {
+    throw new Error(
+      "useBusinessContext must be used within a BusinessProvider"
+    );
+  }
+  return context;
 };
