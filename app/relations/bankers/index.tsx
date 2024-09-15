@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { router, useNavigation } from "expo-router";
+import { useBusinessContext } from "@/lib/context";
 
 const BankerRelations = () => {
   const navigation = useNavigation<any>();
@@ -21,7 +22,7 @@ const BankerRelations = () => {
     });
   }, []);
 
-  const politicianOptions = [
+  const bankerRelationOptions = [
     {
       amount: 250000,
       level: "Regional Level Politician",
@@ -35,6 +36,8 @@ const BankerRelations = () => {
     { amount: 15000000, level: "Prime Minister", influence: 1 },
   ];
 
+  const { increaseInfluence } = useBusinessContext();
+
   return (
     <>
       <ScrollView style={{ maxHeight: "auto", flex: 1 }}>
@@ -46,12 +49,12 @@ const BankerRelations = () => {
                 { letterSpacing: 1, fontFamily: "mon" },
               ]}
             >
-              Investing in politicians futures increases your influence, but
-              also increases the risk of recieving unwanted attention.
+              Build relations with bankers in order to recieve low interest
+              loans and special favours in your business deals.
             </Text>
           </View>
 
-          {politicianOptions.map((item, index) => (
+          {bankerRelationOptions.map((item, index) => (
             <View style={{ marginTop: 10 }} key={index}>
               <View>
                 <View
@@ -101,60 +104,37 @@ const BankerRelations = () => {
                       alignItems: "center",
                     }}
                   >
-                    <View style={{ flex: 1, flexDirection: "row" }}>
-                      <View style={styles.containerThree}>
-                        <Pressable>
-                          <View
-                            style={[
-                              styles.cardSix,
-                              {
-                                backgroundColor: "#9F8170",
-                                paddingLeft: 33,
-                                paddingRight: 33,
-                                alignItems: "center",
-                                justifyContent: "center",
-                              },
-                            ]}
+                    <View style={styles.containerThree}>
+                      <Pressable
+                        onPress={() =>
+                          increaseInfluence(item.amount, item.influence)
+                        }
+                      >
+                        <View
+                          style={[
+                            styles.cardSix,
+                            styles.cardElevated,
+                            {
+                              backgroundColor: "#03C03C",
+                              paddingLeft: 42,
+                              paddingRight: 42,
+                              marginRight: 20,
+                              alignItems: "center",
+                              justifyContent: "center",
+                            },
+                          ]}
+                        >
+                          <Text
+                            style={{
+                              color: "white",
+                              letterSpacing: 0.3,
+                              fontFamily: "mon-sb",
+                            }}
                           >
-                            <Text
-                              style={{
-                                color: "white",
-                                letterSpacing: 0.3,
-                                fontFamily: "mon-sb",
-                              }}
-                            >
-                              No Deal
-                            </Text>
-                          </View>
-                        </Pressable>
-                      </View>
-                      <View style={styles.containerThree}>
-                        <Pressable>
-                          <View
-                            style={[
-                              styles.cardSix,
-                              styles.cardElevated,
-                              {
-                                backgroundColor: "#03C03C",
-                                paddingLeft: 42,
-                                paddingRight: 42,
-                                alignItems: "center",
-                                justifyContent: "center",
-                              },
-                            ]}
-                          >
-                            <Text
-                              style={{
-                                color: "white",
-                                letterSpacing: 0.3,
-                                fontFamily: "mon-sb",
-                              }}
-                            >
-                              Deal
-                            </Text>
-                          </View>
-                        </Pressable>
-                      </View>
+                            Build Relations
+                          </Text>
+                        </View>
+                      </Pressable>
                     </View>
                   </View>
                 </View>

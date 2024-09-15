@@ -21,6 +21,24 @@ const Profile = () => {
       >
         <Text style={styles.openButtonText}>Pay Back Loans</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.openButton}
+        onPress={() => router.push("/capital/loans")}
+      >
+        <Text style={styles.openButtonText}>Handle Lawsuits</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.openButton}
+        onPress={() => router.push("/capital/loans")}
+      >
+        <Text style={styles.openButtonText}>Central Taxes</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.openButton}
+        onPress={() => router.push("/capital/loans")}
+      >
+        <Text style={styles.openButtonText}>Business Lisences</Text>
+      </TouchableOpacity>
     </>
   );
 };

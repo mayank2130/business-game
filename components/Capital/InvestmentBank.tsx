@@ -1,8 +1,3 @@
-{
-  /* Build Relations with Bankers to get investment, loans and special
-  treatments. Higher the influence, lower the interest you have to pay. */
-}
-
 import {
   Image,
   ImageBackground,
@@ -68,7 +63,7 @@ const InvestmentBankLoan = ({
                 At {price.interest}% interest
               </Text>
               <Text style={{ fontFamily: "mon-l", paddingTop: 5 }}>
-                Return {price.durationInDays}
+                Return in {price.durationInDays} days.
               </Text>
             </View>
             <View
