@@ -19,7 +19,7 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
       <Image source={item.source} style={styles.cardImage} />
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={styles.cardDetails}>
-          <Text style={styles.price}>{item.price}</Text>
+          <Text style={styles.price}>$ {item.price.toLocaleString()}</Text>
           <View style={styles.locationContainer}>
             <Entypo name="location" size={16} color="black" />
             <Text style={styles.location}>{item.location}</Text>
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
   },
   buyButton: {
     margin: 20,
-    width: 110,
+    width: 100,
     height: 50,
     borderRadius: 15,
     backgroundColor: "#0070FF",
