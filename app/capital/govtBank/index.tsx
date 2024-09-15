@@ -46,8 +46,8 @@ const GovernmentBank = () => {
                 { letterSpacing: 1, fontFamily: "mon" },
               ]}
             >
-              Higher the influence, lower the interest you have to pay.
-            </Text>
+              Build Government Relations to recieve special favours and cheap loans.
+              </Text>
           </View>
 
           {politicianOptions.map((item, index) => (
