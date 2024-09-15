@@ -1,27 +1,33 @@
-import { StyleSheet, Text, View } from "react-native";
 import React from "react";
-import GameComponent from "@/components/global/Business";
-// import MyTabs from "../TabsTwo";
+import { StyleSheet, Text, View, ScrollView } from "react-native";
+import LoanDisplay from "@/components/Capital/LoanDisplay"; // Adjust the import path as necessary
 
-const profile = () => {
+const Profile = () => {
   return (
     <>
-      <View style={{ backgroundColor: "#fff" }}>
-        <Text style={[styles.headingTextTwo, { marginTop: 40 }]}>Profile </Text>
+      <View style={styles.header}>
+        <Text style={styles.headingText}>Profile</Text>
       </View>
-      <GameComponent />
+      <LoanDisplay />
     </>
   );
 };
 
 const styles = StyleSheet.create({
-  headingTextTwo: {
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  header: {
+    backgroundColor: "#fff",
+    paddingTop: 40,
+    paddingBottom: 16,
+  },
+  headingText: {
     fontSize: 24,
     fontWeight: "bold",
-    paddingHorizontal: 10,
-    margin: 2,
-    marginBottom: 10,
+    paddingHorizontal: 16,
   },
 });
 
-export default profile;
+export default Profile;

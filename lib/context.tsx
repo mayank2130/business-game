@@ -6,7 +6,7 @@ import { Alert } from "react-native";
 export const BALANCE_KEY = "@game_balance";
 export const BUSINESSES_KEY = "@game_businesses";
 export const INFLUENCE_KEY = "@game_influence";
-export const LOAN_KEY = "@game_loan";
+export const LOANS_KEY = "@game_loans";
 
 interface Business {
   id: string;
@@ -17,20 +17,22 @@ interface Business {
 interface LoanOption {
   amount: number;
   interest: number;
-  returnTime: string;
+  durationInDays: number;
 }
 
 interface Loan {
+  id: string;
   amount: number;
   interest: number;
   startTime: number;
+  durationInDays: number;
 }
 
 interface BusinessContextType {
   balance: number;
   influence: number;
   ownedBusinesses: BusinessOptions[];
-  loan: Loan | null;
+  loans: Loan[];
   updateBalance: (newBalance: number) => Promise<void>;
   updateBusinesses: (newBusinesses: BusinessOptions[]) => Promise<void>;
   increaseBusinessLevel: (businessId: string) => Promise<void>;
@@ -41,18 +43,12 @@ interface BusinessContextType {
     influenceAmount: number
   ) => Promise<void>;
   getLoan: (loanOption: LoanOption) => Promise<void>;
+  repayLoan: (loanId: string) => Promise<void>;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(
   undefined
 );
-
-const priceOptions: LoanOption[] = [
-  { amount: 250000, interest: 5, returnTime: "within 1 month" },
-  { amount: 500000, interest: 7, returnTime: "within 3 months" },
-  { amount: 750000, interest: 8, returnTime: "within 6 months" },
-  { amount: 1000000, interest: 10, returnTime: "within 1 year" },
-];
 
 export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -60,22 +56,23 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   const [balance, setBalance] = useState<number>(0);
   const [ownedBusinesses, setOwnedBusinesses] = useState<BusinessOptions[]>([]);
   const [influence, setInfluence] = useState<number>(0);
+  const [loans, setLoans] = useState<Loan[]>([]);
 
-  const [loan, setLoan] = useState<Loan | null>(null);
 
+ 
   useEffect(() => {
     const loadData = async () => {
       try {
         const storedBalance = await AsyncStorage.getItem(BALANCE_KEY);
         const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
         const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
-        const storedLoan = await AsyncStorage.getItem(LOAN_KEY);
+        const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
 
         if (storedBalance !== null) setBalance(parseFloat(storedBalance));
         if (storedBusinesses !== null)
           setOwnedBusinesses(JSON.parse(storedBusinesses));
         if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
-        if (storedLoan !== null) setLoan(JSON.parse(storedLoan));
+        if (storedLoans !== null) setLoans(JSON.parse(storedLoans));
       } catch (error) {
         console.error("Error loading data:", error);
       }
@@ -84,7 +81,6 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     loadData();
   }, []);
 
-  // New useEffect to update balance based on total income
   useEffect(() => {
     const updateInterval = 1000; // Update every second
     const timer = setInterval(() => {
@@ -92,20 +88,29 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
       let newBalance = balance + incomePerSecond;
 
-      // Apply loan interest (hourly)
-      if (loan) {
-        const hoursSinceLoan = (Date.now() - loan.startTime) / (1000 * 60 * 60);
-        const interestPerHour =
-          (loan.amount * (loan.interest / 100)) / (30 * 24); // Assuming 30 days per month
-        const totalInterest = interestPerHour * hoursSinceLoan;
-        newBalance -= totalInterest / 3600; // Deduct interest per second
+      // Check for loans that need to be repaid
+      const currentTime = Date.now();
+      const updatedLoans = loans.filter(loan => {
+        const loanDurationMs = loan.durationInDays * 24 * 60 * 60 * 1000;
+        if (currentTime >= loan.startTime + loanDurationMs) {
+          const totalToRepay = loan.amount + (loan.amount * loan.interest / 100);
+          newBalance -= totalToRepay;
+          Alert.alert("Loan Repayment", `A loan of $${loan.amount} has been automatically repaid.`);
+          return false; // Remove this loan from the array
+        }
+        return true; // Keep this loan in the array
+      });
+
+      if (updatedLoans.length !== loans.length) {
+        setLoans(updatedLoans);
+        AsyncStorage.setItem(LOANS_KEY, JSON.stringify(updatedLoans));
       }
 
       updateBalance(newBalance);
     }, updateInterval);
 
     return () => clearInterval(timer);
-  }, [balance, ownedBusinesses, loan]);
+  }, [balance, ownedBusinesses, loans]);
 
   const updateBalance = async (newBalance: number) => {
     try {
@@ -198,34 +203,50 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const getLoan = async (loanOption: LoanOption) => {
     try {
-      // Skip the loan check if influence is greater than 2
-      if (influence <= 25 && loan) {
-        Alert.alert(
-          "Oops!",
-          "You already have an active loan. Increase influence to take multiple loans."
-        );
-        return;
-      }
-
-      // Continue if no active loan or influence is greater than 2
       const newLoan: Loan = {
+        id: Date.now().toString(),
         amount: loanOption.amount,
         interest: loanOption.interest,
         startTime: Date.now(),
+        durationInDays: loanOption.durationInDays,
       };
 
-      await AsyncStorage.setItem(LOAN_KEY, JSON.stringify(newLoan));
-      setLoan(newLoan);
+      const updatedLoans = [...loans, newLoan];
+      await AsyncStorage.setItem(LOANS_KEY, JSON.stringify(updatedLoans));
+      setLoans(updatedLoans);
 
       const newBalance = balance + loanOption.amount;
       await updateBalance(newBalance);
 
       Alert.alert(
         "Success",
-        `Loan of $${loanOption.amount} acquired. Remember to repay ${loanOption.returnTime}.`
+        `Loan of $${loanOption.amount} acquired. It will be automatically repaid in ${loanOption.durationInDays} days.`
       );
     } catch (error) {
       console.error("Error getting loan:", error);
+    }
+  };
+
+  const repayLoan = async (loanId: string) => {
+    const loanToRepay = loans.find(loan => loan.id === loanId);
+    if (!loanToRepay) {
+      Alert.alert("Error", "Loan not found.");
+      return;
+    }
+  
+    const totalToRepay = loanToRepay.amount + (loanToRepay.amount * loanToRepay.interest / 100);
+    
+    const newBalance = balance - totalToRepay;
+  
+    try {
+      await updateBalance(newBalance);
+      const updatedLoans = loans.filter(loan => loan.id !== loanId);
+      await AsyncStorage.setItem(LOANS_KEY, JSON.stringify(updatedLoans));
+      setLoans(updatedLoans);
+      
+      Alert.alert("Success", "Loan repaid successfully.");
+    } catch (error) {
+      console.error("Error repaying loan:", error);
     }
   };
 
@@ -235,7 +256,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         balance,
         influence,
         ownedBusinesses,
-        loan,
+        loans,
         updateBalance,
         updateBusinesses,
         increaseBusinessLevel,
@@ -243,6 +264,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         getTotalIncome,
         increaseInfluence,
         getLoan,
+        repayLoan,
       }}
     >
       {children}

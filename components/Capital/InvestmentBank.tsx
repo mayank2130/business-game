@@ -68,7 +68,7 @@ const InvestmentBankLoan = ({
                 At {price.interest}% interest
               </Text>
               <Text style={{ fontFamily: "mon-l", paddingTop: 5 }}>
-                Return {price.returnTime}
+                Return {price.durationInDays}
               </Text>
             </View>
             <View

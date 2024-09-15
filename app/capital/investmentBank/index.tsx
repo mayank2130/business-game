@@ -41,22 +41,22 @@ const InvestmentBank = () => {
     {
       amount: 250000,
       interest: interestRate ? interestRate[0] : 10,
-      returnTime: "within 1 month",
+      durationInDays: 1,
     },
     {
       amount: 500000,
       interest: interestRate ? interestRate[1] : 10,
-      returnTime: "within 3 months",
+      durationInDays: 1.5,
     },
     {
       amount: 750000,
       interest: interestRate ? interestRate[2] : 10,
-      returnTime: "within 6 months",
+      durationInDays: 2,
     },
     {
       amount: 1000000,
       interest: interestRate ? interestRate[3] : 10,
-      returnTime: "within 1 year",
+      durationInDays: 2.5,
     },
   ];
 
