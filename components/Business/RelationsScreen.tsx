@@ -10,14 +10,13 @@ import {
 } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
-import { useNavigation, useRouter } from "expo-router";
+import { useNavigation } from "expo-router";
 
 export default function BusinessScreen() {
   function openWebsite(websiteLink: string) {
     Linking.openURL(websiteLink);
   }
   const navigation = useNavigation();
-  const router = useRouter();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -32,7 +31,7 @@ export default function BusinessScreen() {
         <View style={{ marginTop: 30 }}>
           <Text style={styles.headingText}>Build Relations</Text>
           <View style={styles.containerTwo}>
-            <TouchableOpacity onPress={() => router.push("/relations/politicians")}>
+            <TouchableOpacity>
               <View
                 style={[
                   styles.cardFour,
@@ -56,7 +55,7 @@ export default function BusinessScreen() {
             </TouchableOpacity>
           </View>
           <View style={styles.containerTwo}>
-            <TouchableOpacity onPress={() => router.push("/relations/bankers")}>
+            <TouchableOpacity>
               <View
                 style={[
                   styles.cardFour,
@@ -80,7 +79,7 @@ export default function BusinessScreen() {
             </TouchableOpacity>
           </View>
           <View style={styles.containerTwo}>
-            <TouchableOpacity onPress={() => router.push("/relations/mafia")}>
+            <TouchableOpacity>
               <View
                 style={[
                   styles.cardFour,
