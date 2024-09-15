@@ -1,14 +1,26 @@
 import React from "react";
-import { StyleSheet, Text, View, ScrollView } from "react-native";
-import LoanDisplay from "@/components/Capital/LoanDisplay"; // Adjust the import path as necessary
+import {
+  StyleSheet,
+  Text,
+  View,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import { useRouter } from "expo-router";
 
 const Profile = () => {
+  const router = useRouter();
   return (
     <>
       <View style={styles.header}>
         <Text style={styles.headingText}>Profile</Text>
       </View>
-      <LoanDisplay />
+      <TouchableOpacity
+        style={styles.openButton}
+        onPress={() => router.push("/capital/loans")}
+      >
+        <Text style={styles.openButtonText}>Pay Back Loans</Text>
+      </TouchableOpacity>
     </>
   );
 };
@@ -17,6 +29,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  openButton: {
+    backgroundColor: "#32CD32",
+    borderRadius: 10,
+    padding: 15,
+    margin: 10,
+    alignItems: "center",
+  },
+  openButtonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   header: {
     backgroundColor: "#fff",
