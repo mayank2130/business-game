@@ -1,8 +1,3 @@
-{
-  /* Build Relations with Bankers to get investment, loans and special
-treatments. Higher the influence, lower the interest you have to pay. */
-}
-
 import {
   Image,
   ImageBackground,
@@ -16,6 +11,7 @@ import {
 import React, { useLayoutEffect } from "react";
 import { router, useNavigation } from "expo-router";
 import { useBusinessContext } from "@/lib/context";
+import InvestmentBankLoan from "@/components/Capital/InvestmentBank";
 
 const InvestmentBank = () => {
   const navigation = useNavigation<any>();
@@ -27,14 +23,43 @@ const InvestmentBank = () => {
     });
   }, []);
 
+  const { influence } = useBusinessContext();
+
+  let interestRate;
+
+  if (influence < 6) {
+    interestRate = [9, 8, 8, 7];
+  } else if (influence > 6 && influence < 25) {
+    interestRate = [7, 6, 6, 5];
+  } else if (influence > 25 && influence < 100) {
+    interestRate = [2, 3, 3, 3];
+  } else {
+    interestRate = [1, 1, 1, 0];
+  }
+
   const priceOptions = [
-    { amount: 250000, interest: 5, returnTime: "within 1 month" },
-    { amount: 500000, interest: 7, returnTime: "within 3 months" },
-    { amount: 750000, interest: 8, returnTime: "within 6 months" },
-    { amount: 1000000, interest: 10, returnTime: "within 1 year" },
+    {
+      amount: 250000,
+      interest: interestRate ? interestRate[0] : 10,
+      returnTime: "within 1 month",
+    },
+    {
+      amount: 500000,
+      interest: interestRate ? interestRate[1] : 10,
+      returnTime: "within 3 months",
+    },
+    {
+      amount: 750000,
+      interest: interestRate ? interestRate[2] : 10,
+      returnTime: "within 6 months",
+    },
+    {
+      amount: 1000000,
+      interest: interestRate ? interestRate[3] : 10,
+      returnTime: "within 1 year",
+    },
   ];
 
-  const { getLoan } = useBusinessContext();
   return (
     <>
       <ScrollView style={{ maxHeight: "auto", flex: 1 }}>
@@ -62,7 +87,7 @@ const InvestmentBank = () => {
               ]}
             >
               <ImageBackground
-                source={require("../../../assets/images/bank.png")}
+                source={require("../../../assets/images/banktwo.png")}
                 style={{
                   height: 60,
                   width: 60,
@@ -72,7 +97,7 @@ const InvestmentBank = () => {
                   alignItems: "center",
                 }}
               ></ImageBackground>
-              <Text style={styles.innerTxt}>City Bank</Text>
+              <Text style={styles.innerTxt}>Investment Bank</Text>
             </View>
           </View>
         </View>
@@ -91,103 +116,7 @@ const InvestmentBank = () => {
           </View>
 
           {priceOptions.map((price, index) => (
-            <View style={{ marginTop: 20 }} key={index}>
-              <View>
-                <View
-                  style={[
-                    styles.cardFour,
-                    {
-                      alignItems: "flex-start",
-                      justifyContent: "flex-start",
-                      backgroundColor: "#fff",
-                      borderRadius: 20,
-                      paddingLeft: 20,
-                    },
-                  ]}
-                >
-                  <Text style={[styles.innerTxt, { color: "green" }]}>
-                    ${price.amount.toLocaleString()}
-                  </Text>
-                  <View
-                    style={{
-                      alignItems: "flex-start",
-                      justifyContent: "flex-start",
-                      paddingTop: 13,
-                    }}
-                  >
-                    <Text style={styles.overlayText}>
-                      At {price.interest}% interest
-                    </Text>
-                    <Text style={{ fontFamily: "mon-l", paddingTop: 5 }}>
-                      Return {price.returnTime}
-                    </Text>
-                  </View>
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      paddingTop: 30,
-                      alignItems: "center",
-                    }}
-                  >
-                    <View style={{ flex: 1, flexDirection: "row" }}>
-                      <View style={styles.containerThree}>
-                        <Pressable>
-                          <View
-                            style={[
-                              styles.cardSix,
-                              {
-                                backgroundColor: "#9F8170",
-                                paddingLeft: 33,
-                                paddingRight: 33,
-                                alignItems: "center",
-                                justifyContent: "center",
-                              },
-                            ]}
-                          >
-                            <Text
-                              style={{
-                                color: "white",
-                                letterSpacing: 0.3,
-                                fontFamily: "mon-sb",
-                              }}
-                            >
-                              No Deal
-                            </Text>
-                          </View>
-                        </Pressable>
-                      </View>
-                      <View style={styles.containerThree}>
-                        <Pressable onPress={() => getLoan(price)}>
-                          <View
-                            style={[
-                              styles.cardSix,
-                              styles.cardElevated,
-                              {
-                                backgroundColor: "#03C03C",
-                                paddingLeft: 42,
-                                paddingRight: 42,
-                                alignItems: "center",
-                                justifyContent: "center",
-                              },
-                            ]}
-                          >
-                            <Text
-                              style={{
-                                color: "white",
-                                letterSpacing: 0.3,
-                                fontFamily: "mon-sb",
-                              }}
-                            >
-                              Deal
-                            </Text>
-                          </View>
-                        </Pressable>
-                      </View>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
+            <InvestmentBankLoan price={price} index={index} key={index} />
           ))}
         </View>
       </ScrollView>
