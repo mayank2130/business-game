@@ -53,6 +53,18 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     loadData();
   }, []);
 
+  // New useEffect to update balance based on total income
+  useEffect(() => {
+    const updateInterval = 1000; // Update every second (adjust as needed)
+    const timer = setInterval(() => {
+      const totalIncome = getTotalIncome();
+      const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
+      updateBalance(balance + incomePerSecond);
+    }, updateInterval);
+
+    return () => clearInterval(timer);
+  }, [balance, ownedBusinesses]);
+
   const updateBalance = async (newBalance: number) => {
     try {
       await AsyncStorage.setItem(BALANCE_KEY, newBalance.toString());
@@ -70,6 +82,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("Error updating businesses:", error);
     }
   };
+
   const increaseBusinessLevel = async (businessId: string) => {
     const business = ownedBusinesses.find((b) => b.id === businessId);
     if (!business) return;

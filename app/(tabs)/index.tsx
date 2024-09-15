@@ -33,7 +33,7 @@ const App = () => {
         </View>
       </View>
       <TouchableOpacity
-        onPress={() => updateBalance(2000000)}
+        onPress={() => updateBalance(balance + 2000000)}
         style={[styles.containerTwo, { backgroundColor: "#fff" }]}
       >
         <FontAwesome name="hand-o-up" size={75} color="black" />

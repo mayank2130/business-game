@@ -38,6 +38,7 @@
 
 // export default CompanyInfo;
 
+
 import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
   View,
@@ -45,7 +46,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -57,20 +57,33 @@ const CompanyInfo: React.FC = () => {
   const params = useLocalSearchParams();
   const navigation = useNavigation();
   const router = useRouter();
-  const { balance, ownedBusinesses, increaseBusinessLevel, getCurrentIncome } = useBusinessContext();
+  const { balance, ownedBusinesses, increaseBusinessLevel, getCurrentIncome } =
+    useBusinessContext();
 
   const [business, setBusiness] = useState<BusinessOptions | null>(null);
 
   useEffect(() => {
     if (params.data) {
       try {
-        const parsedBusiness: BusinessOptions = JSON.parse(params.data as string);
+        const parsedBusiness: BusinessOptions = JSON.parse(
+          params.data as string
+        );
         setBusiness(parsedBusiness);
       } catch (error) {
         console.error("Error parsing business data:", error);
       }
     }
   }, [params.data]);
+
+  // New useEffect to update business data when ownedBusinesses changes
+  useEffect(() => {
+    if (business) {
+      const updatedBusiness = ownedBusinesses.find(b => b.id === business.id);
+      if (updatedBusiness) {
+        setBusiness(updatedBusiness);
+      }
+    }
+  }, [ownedBusinesses, business]);
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -89,6 +102,11 @@ const CompanyInfo: React.FC = () => {
   const currentIncome = getCurrentIncome(business.id);
   const currentLevel = business.currentLevel || 1;
   const nextLevelData: OptionLevels | undefined = business.levels[currentLevel];
+
+  const handleIncreaseLevel = async () => {
+    await increaseBusinessLevel(business.id);
+    // The business state will be updated automatically by the useEffect hook
+  };
 
   return (
     <>
@@ -144,7 +162,7 @@ const CompanyInfo: React.FC = () => {
         )}
 
         <TouchableOpacity
-          onPress={() => increaseBusinessLevel(business.id)}
+          onPress={handleIncreaseLevel}
           style={styles.openButton}
           disabled={!nextLevelData}
         >
@@ -161,6 +179,7 @@ const CompanyInfo: React.FC = () => {
   );
 };
 
+export default CompanyInfo;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -257,5 +276,3 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
 });
-
-export default CompanyInfo;
