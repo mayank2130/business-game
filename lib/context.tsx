@@ -2,11 +2,13 @@ import React, { createContext, useState, useEffect, useContext } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BusinessOptions, OptionLevels } from "@/constants/Business";
 import { Alert } from "react-native";
+import { personalPropertyData, Property } from "@/constants/Property";
 
 export const BALANCE_KEY = "@game_balance";
 export const BUSINESSES_KEY = "@game_businesses";
 export const INFLUENCE_KEY = "@game_influence";
 export const LOANS_KEY = "@game_loans";
+export const PROPERTIES_KEY = "@game_properties";
 
 interface Business {
   id: string;
@@ -33,6 +35,7 @@ interface BusinessContextType {
   influence: number;
   ownedBusinesses: BusinessOptions[];
   loans: Loan[];
+  ownedProperties: Property[];
   updateBalance: (newBalance: number) => Promise<void>;
   updateBusinesses: (newBusinesses: BusinessOptions[]) => Promise<void>;
   increaseBusinessLevel: (businessId: string) => Promise<void>;
@@ -44,6 +47,8 @@ interface BusinessContextType {
   ) => Promise<void>;
   getLoan: (loanOption: LoanOption) => Promise<void>;
   repayLoan: (loanId: string) => Promise<void>;
+  buyProperty: (propertyId: string) => Promise<void>;
+  getPropertyIncome: () => number;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(
@@ -57,9 +62,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   const [ownedBusinesses, setOwnedBusinesses] = useState<BusinessOptions[]>([]);
   const [influence, setInfluence] = useState<number>(0);
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [ownedProperties, setOwnedProperties] = useState<Property[]>([]);
 
-
- 
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -67,12 +71,15 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
         const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
         const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
+        const storedProperties = await AsyncStorage.getItem(PROPERTIES_KEY);
 
         if (storedBalance !== null) setBalance(parseFloat(storedBalance));
         if (storedBusinesses !== null)
           setOwnedBusinesses(JSON.parse(storedBusinesses));
         if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
         if (storedLoans !== null) setLoans(JSON.parse(storedLoans));
+        if (storedProperties !== null)
+          setOwnedProperties(JSON.parse(storedProperties));
       } catch (error) {
         console.error("Error loading data:", error);
       }
@@ -90,12 +97,16 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
       // Check for loans that need to be repaid
       const currentTime = Date.now();
-      const updatedLoans = loans.filter(loan => {
+      const updatedLoans = loans.filter((loan) => {
         const loanDurationMs = loan.durationInDays * 24 * 60 * 60 * 1000;
         if (currentTime >= loan.startTime + loanDurationMs) {
-          const totalToRepay = loan.amount + (loan.amount * loan.interest / 100);
+          const totalToRepay =
+            loan.amount + (loan.amount * loan.interest) / 100;
           newBalance -= totalToRepay;
-          Alert.alert("Loan Repayment", `A loan of $${loan.amount} has been automatically repaid.`);
+          Alert.alert(
+            "Loan Repayment",
+            `A loan of $${loan.amount} has been automatically repaid.`
+          );
           return false; // Remove this loan from the array
         }
         return true; // Keep this loan in the array
@@ -228,26 +239,62 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const repayLoan = async (loanId: string) => {
-    const loanToRepay = loans.find(loan => loan.id === loanId);
+    const loanToRepay = loans.find((loan) => loan.id === loanId);
     if (!loanToRepay) {
       Alert.alert("Error", "Loan not found.");
       return;
     }
-  
-    const totalToRepay = loanToRepay.amount + (loanToRepay.amount * loanToRepay.interest / 100);
-    
+
+    const totalToRepay =
+      loanToRepay.amount + (loanToRepay.amount * loanToRepay.interest) / 100;
+
     const newBalance = balance - totalToRepay;
-  
+
     try {
       await updateBalance(newBalance);
-      const updatedLoans = loans.filter(loan => loan.id !== loanId);
+      const updatedLoans = loans.filter((loan) => loan.id !== loanId);
       await AsyncStorage.setItem(LOANS_KEY, JSON.stringify(updatedLoans));
       setLoans(updatedLoans);
-      
+
       Alert.alert("Success", "Loan repaid successfully.");
     } catch (error) {
       console.error("Error repaying loan:", error);
     }
+  };
+
+  const buyProperty = async (propertyId: string) => {
+    const propertyToBuy = personalPropertyData.find((p) => p.id === propertyId);
+    if (!propertyToBuy) {
+      Alert.alert("Error", "Property not found.");
+      return;
+    }
+    if (balance < propertyToBuy.price) {
+      Alert.alert("Error", "Insufficient balance to buy this property.");
+      return;
+    }
+
+    const newBalance = balance - propertyToBuy.price;
+    const updatedProperties = [...ownedProperties, propertyToBuy];
+
+    try {
+      await updateBalance(newBalance);
+      await AsyncStorage.setItem(
+        PROPERTIES_KEY,
+        JSON.stringify(updatedProperties)
+      );
+      setOwnedProperties(updatedProperties);
+      Alert.alert(
+        "Success",
+        `You have successfully purchased the property in ${propertyToBuy.location}!`
+      );
+    } catch (error) {
+      console.error("Error buying property:", error);
+    }
+  };
+
+  const getPropertyIncome = (): number => {
+    // You can implement a more complex income calculation based on property values or other factors
+    return ownedProperties.length * 1000000; // Example: Each property generates $1,000,000 per hour
   };
 
   return (
@@ -257,6 +304,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         influence,
         ownedBusinesses,
         loans,
+        ownedProperties,
         updateBalance,
         updateBusinesses,
         increaseBusinessLevel,
@@ -265,6 +313,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         increaseInfluence,
         getLoan,
         repayLoan,
+        buyProperty,
+        getPropertyIncome,
       }}
     >
       {children}

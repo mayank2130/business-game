@@ -12,8 +12,15 @@ import {
 import { personalPropertyData } from "@/constants/Property";
 
 import type { Property } from "@/constants/Property";
+import { useBusinessContext } from "@/lib/context";
 
 const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
+  const { balance, buyProperty } = useBusinessContext();
+
+  const handleBuy = () => {
+    buyProperty(item.id);
+  };
+
   return (
     <View style={styles.card}>
       <Image source={item.source} style={styles.cardImage} />
@@ -26,7 +33,11 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
           </View>
         </View>
         <View>
-          <TouchableOpacity style={styles.buyButton}>
+          <TouchableOpacity
+            onPress={handleBuy}
+            disabled={balance < item.price}
+            style={styles.buyButton}
+          >
             <Text style={styles.innerTxt}>Buy</Text>
           </TouchableOpacity>
         </View>
@@ -36,10 +47,17 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
 };
 
 const PropertyList: React.FC = () => {
+
+  const { ownedProperties } = useBusinessContext();
+
+  const availableProperties = personalPropertyData.filter(
+    property => !ownedProperties.some(ownedProperty => ownedProperty.id === property.id)
+  );
+
   return (
     <View style={{ flex: 1, alignItems: "center", paddingVertical: 10 }}>
       <FlatList
-        data={personalPropertyData}
+        data={availableProperties}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <PropertyCard item={item} />}
       />

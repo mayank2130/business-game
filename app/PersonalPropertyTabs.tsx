@@ -7,7 +7,7 @@ const Tab = createMaterialTopTabNavigator();
 export default function PersonalPropertyTabs() {
   return (
     <Tab.Navigator>
-      <Tab.Screen name="Bought" component={OwnedPersonalProp} />
+      <Tab.Screen name="Owned" component={OwnedPersonalProp} />
       <Tab.Screen name="Market" component={BuyPersonelProp} />
     </Tab.Navigator>
   );
