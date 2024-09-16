@@ -52,13 +52,19 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
 const PropertyList: React.FC = () => {
   const { ownedProperties } = useBusinessContext();
 
+  const properties = ownedProperties.length <= 0;
+
   return (
     <View style={{ flex: 1, alignItems: "center", paddingVertical: 10 }}>
-      <FlatList
-        data={ownedProperties}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <PropertyCard item={item} />}
-      />
+      {properties ? (
+        <Text>You don't own any properties!</Text>
+      ) : (
+        <FlatList
+          data={ownedProperties}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <PropertyCard item={item} />}
+        />
+      )}
     </View>
   );
 };

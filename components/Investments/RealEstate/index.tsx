@@ -17,6 +17,7 @@ export default function BusinessScreen() {
   const navigation = useNavigation();
 
   const { getTotalRentalIncome } = useBusinessContext();
+  const totalRent = getTotalRentalIncome();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,10 +49,17 @@ export default function BusinessScreen() {
                   { alignItems: "center", justifyContent: "center" },
                 ]}
               >
-                <Text style={[styles.innerTxt, { letterSpacing: 1 }]}>
-                  $ {getTotalRentalIncome()}
+                <Text
+                  style={[
+                    styles.innerTxt,
+                    { letterSpacing: 1, color: "white" },
+                  ]}
+                >
+                  $ {totalRent.toLocaleString()}
                 </Text>
-                <Text style={[styles.overlayText]}>Rental income per hour</Text>
+                <Text style={[styles.overlayText, { fontFamily: "mon-sb" }]}>
+                  Rental income per hour
+                </Text>
               </View>
             </LinearGradient>
           </View>
