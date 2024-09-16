@@ -11,10 +11,12 @@ import {
 import React, { useLayoutEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
 import { useNavigation, useRouter } from "expo-router";
+import { useBusinessContext } from "@/lib/context";
 
 export default function BusinessScreen() {
-
   const navigation = useNavigation();
+
+  const { getTotalRentalIncome } = useBusinessContext();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -47,7 +49,7 @@ export default function BusinessScreen() {
                 ]}
               >
                 <Text style={[styles.innerTxt, { letterSpacing: 1 }]}>
-                  $ 2,279,742,500
+                  $ {getTotalRentalIncome()}
                 </Text>
                 <Text style={[styles.overlayText]}>Rental income per hour</Text>
               </View>
@@ -55,9 +57,7 @@ export default function BusinessScreen() {
           </View>
           <View style={styles.containerTwo}>
             <TouchableOpacity
-              onPress={() =>
-                router.push("/investments/realEstate/commercial")
-              }
+              onPress={() => router.push("/investments/realEstate/commercial")}
             >
               <View
                 style={[
@@ -84,9 +84,7 @@ export default function BusinessScreen() {
           </View>
           <View style={styles.containerTwo}>
             <TouchableOpacity
-              onPress={() =>
-                router.push("/investments/realEstate/personal")
-              }
+              onPress={() => router.push("/investments/realEstate/personal")}
             >
               <View
                 style={[

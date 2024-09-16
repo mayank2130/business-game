@@ -20,6 +20,7 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={styles.cardDetails}>
           <Text style={styles.price}>$ {item.price.toLocaleString()}</Text>
+          <Text style={styles.price}>Rent: ${item.rentalIncome}/hour</Text>
           <View style={styles.locationContainer}>
             <Entypo name="location" size={16} color="black" />
             <Text style={styles.location}>{item.location}</Text>

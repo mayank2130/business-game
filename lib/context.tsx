@@ -4,7 +4,7 @@ import { BusinessOptions, OptionLevels } from "@/constants/Business";
 import { Alert } from "react-native";
 import { personalPropertyData, Property } from "@/constants/Property";
 
-export const BALANCE_KEY = "@game_balance";
+export const BALANCE_KEY = "@game_full_balance";
 export const BUSINESSES_KEY = "@game_businesses";
 export const INFLUENCE_KEY = "@game_influence";
 export const LOANS_KEY = "@game_loans";
@@ -34,21 +34,27 @@ interface BusinessContextType {
   balance: number;
   influence: number;
   ownedBusinesses: BusinessOptions[];
-  loans: Loan[];
   ownedProperties: Property[];
+  availableProperties: Property[];
+  loans: Loan[];
   updateBalance: (newBalance: number) => Promise<void>;
   updateBusinesses: (newBusinesses: BusinessOptions[]) => Promise<void>;
+  updateProperties: (
+    newOwnedProperties: Property[],
+    newAvailableProperties: Property[]
+  ) => Promise<void>;
   increaseBusinessLevel: (businessId: string) => Promise<void>;
   getCurrentIncome: (businessId: string) => number;
   getTotalIncome: () => number;
+  getTotalRentalIncome: () => number;
+  sellProperty: (propertyId: string) => Promise<void>;
+  buyProperty: (propertyId: string) => Promise<void>;
   increaseInfluence: (
     influenceCost: number,
     influenceAmount: number
   ) => Promise<void>;
   getLoan: (loanOption: LoanOption) => Promise<void>;
   repayLoan: (loanId: string) => Promise<void>;
-  buyProperty: (propertyId: string) => Promise<void>;
-  getPropertyIncome: () => number;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(
@@ -60,26 +66,40 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [balance, setBalance] = useState<number>(0);
   const [ownedBusinesses, setOwnedBusinesses] = useState<BusinessOptions[]>([]);
+  const [ownedProperties, setOwnedProperties] = useState<Property[]>([]);
+  const [availableProperties, setAvailableProperties] = useState<Property[]>(
+    []
+  );
   const [influence, setInfluence] = useState<number>(0);
   const [loans, setLoans] = useState<Loan[]>([]);
-  const [ownedProperties, setOwnedProperties] = useState<Property[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
       try {
         const storedBalance = await AsyncStorage.getItem(BALANCE_KEY);
         const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
+        const storedProperties = await AsyncStorage.getItem(PROPERTIES_KEY);
         const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
         const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
-        const storedProperties = await AsyncStorage.getItem(PROPERTIES_KEY);
 
         if (storedBalance !== null) setBalance(parseFloat(storedBalance));
         if (storedBusinesses !== null)
           setOwnedBusinesses(JSON.parse(storedBusinesses));
+        const allProperties = personalPropertyData;
+        
+        if (storedProperties !== null) {
+          const ownedPropertyIds = JSON.parse(storedProperties);
+          console.log("Owned property IDs:", ownedPropertyIds); // Debug log
+
+          setOwnedProperties(allProperties.filter((p: Property) => ownedPropertyIds.includes(p.id)));
+          setAvailableProperties(allProperties.filter((p: Property) => !ownedPropertyIds.includes(p.id)));
+        } else {
+          setOwnedProperties([]);
+          setAvailableProperties(allProperties);
+        }
+
         if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
         if (storedLoans !== null) setLoans(JSON.parse(storedLoans));
-        if (storedProperties !== null)
-          setOwnedProperties(JSON.parse(storedProperties));
       } catch (error) {
         console.error("Error loading data:", error);
       }
@@ -91,7 +111,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const updateInterval = 1000; // Update every second
     const timer = setInterval(() => {
-      const totalIncome = getTotalIncome();
+      const totalIncome = getTotalIncome() + getTotalRentalIncome();
       const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
       let newBalance = balance + incomePerSecond;
 
@@ -121,7 +141,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     }, updateInterval);
 
     return () => clearInterval(timer);
-  }, [balance, ownedBusinesses, loans]);
+  }, [balance, ownedBusinesses, ownedProperties, loans]);
 
   const updateBalance = async (newBalance: number) => {
     try {
@@ -262,40 +282,81 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const getTotalRentalIncome = (): number => {
+    return ownedProperties.reduce(
+      (total, property) => total + (property.rentalIncome || 0),
+      0
+    );
+  };
   const buyProperty = async (propertyId: string) => {
-    const propertyToBuy = personalPropertyData.find((p) => p.id === propertyId);
-    if (!propertyToBuy) {
+    console.log("Attempting to buy property with id:", propertyId); // Debug log
+    console.log("Current available properties:", availableProperties); // Debug log
+
+    const property = availableProperties.find((p) => p.id === propertyId);
+    if (!property) {
+      console.log("Property not found in available properties"); // Debug log
       Alert.alert("Error", "Property not found.");
       return;
     }
-    if (balance < propertyToBuy.price) {
+
+    if (balance < property.price) {
       Alert.alert("Error", "Insufficient balance to buy this property.");
       return;
     }
 
-    const newBalance = balance - propertyToBuy.price;
-    const updatedProperties = [...ownedProperties, propertyToBuy];
+    const newBalance = balance - property.price;
+    await updateBalance(newBalance);
 
+    const newOwnedProperties = [...ownedProperties, property];
+    const newAvailableProperties = availableProperties.filter(
+      (p) => p.id !== propertyId
+    );
+
+    await updateProperties(newOwnedProperties, newAvailableProperties);
+
+    Alert.alert(
+      "Success",
+      `${property.location} purchased for $${property.price}.`
+    );
+  };
+
+  const updateProperties = async (
+    newOwnedProperties: Property[],
+    newAvailableProperties: Property[]
+  ) => {
     try {
-      await updateBalance(newBalance);
-      await AsyncStorage.setItem(
-        PROPERTIES_KEY,
-        JSON.stringify(updatedProperties)
-      );
-      setOwnedProperties(updatedProperties);
-      Alert.alert(
-        "Success",
-        `You have successfully purchased the property in ${propertyToBuy.location}!`
-      );
+      const ownedPropertyIds = newOwnedProperties.map(p => p.id);
+      await AsyncStorage.setItem(PROPERTIES_KEY, JSON.stringify(ownedPropertyIds));
+      setOwnedProperties(newOwnedProperties);
+      setAvailableProperties(newAvailableProperties);
+      
+      console.log("Properties updated:"); // Debug log
+      console.log("New owned properties:", newOwnedProperties); // Debug log
+      console.log("New available properties:", newAvailableProperties); // Debug log
     } catch (error) {
-      console.error("Error buying property:", error);
+      console.error("Error updating properties:", error);
     }
   };
 
-  const getPropertyIncome = (): number => {
-    // You can implement a more complex income calculation based on property values or other factors
-    return ownedProperties.length * 1000000; // Example: Each property generates $1,000,000 per hour
-  };
+  const sellProperty = async (propertyId: string) => {
+    const property = ownedProperties.find((p) => p.id === propertyId);
+    if (!property) {
+      Alert.alert("Error", "Property not found.");
+      return;
+    }
+
+    const newBalance = balance + property.price;
+    await updateBalance(newBalance);
+
+    const newOwnedProperties = ownedProperties.filter(
+      (p) => p.id !== propertyId
+    );
+    const newAvailableProperties = [...availableProperties, property];
+
+    await updateProperties(newOwnedProperties, newAvailableProperties);
+
+    Alert.alert("Success", `${property.location} sold for $${property.price}.`);
+  }
 
   return (
     <BusinessContext.Provider
@@ -303,18 +364,21 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         balance,
         influence,
         ownedBusinesses,
-        loans,
         ownedProperties,
+        availableProperties,
+        loans,
         updateBalance,
         updateBusinesses,
+        updateProperties,
         increaseBusinessLevel,
         getCurrentIncome,
         getTotalIncome,
+        getTotalRentalIncome,
+        sellProperty,
+        buyProperty,
         increaseInfluence,
         getLoan,
         repayLoan,
-        buyProperty,
-        getPropertyIncome,
       }}
     >
       {children}
