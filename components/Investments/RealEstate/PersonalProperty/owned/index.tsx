@@ -14,18 +14,35 @@ import type { Property } from "@/constants/Property";
 import { useBusinessContext } from "@/lib/context";
 
 const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
+  const { sellProperty } = useBusinessContext();
   return (
     <View style={styles.card}>
       <Image source={item.source} style={styles.cardImage} />
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={styles.cardDetails}>
-          <Text style={styles.price}>$ {item.price.toLocaleString()}</Text>
-          <Text style={styles.price}>Rent: ${item.rentalIncome}/hour</Text>
+          <Text style={styles.price}>
+            Value: $ {item.price.toLocaleString()}
+          </Text>
+          <Text style={[styles.price, { fontSize: 16, fontFamily: "mon-sb" }]}>
+            Rent: $ {item.rentalIncome.toLocaleString()}/hour
+          </Text>
           <View style={styles.locationContainer}>
             <Entypo name="location" size={16} color="black" />
             <Text style={styles.location}>{item.location}</Text>
           </View>
         </View>
+        <TouchableOpacity
+          onPress={() => sellProperty(item.id)}
+          style={{
+            backgroundColor: "#03C03C",
+            padding: 10,
+            paddingHorizontal: 25,
+            marginRight: 20,
+            borderRadius: 10,
+          }}
+        >
+          <Text style={{ color: "white", fontFamily: "mon-sb" }}>Sell</Text>
+        </TouchableOpacity>
         <View></View>
       </View>
     </View>

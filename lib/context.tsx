@@ -89,7 +89,6 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         
         if (storedProperties !== null) {
           const ownedPropertyIds = JSON.parse(storedProperties);
-          console.log("Owned property IDs:", ownedPropertyIds); // Debug log
 
           setOwnedProperties(allProperties.filter((p: Property) => ownedPropertyIds.includes(p.id)));
           setAvailableProperties(allProperties.filter((p: Property) => !ownedPropertyIds.includes(p.id)));
@@ -289,12 +288,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
   const buyProperty = async (propertyId: string) => {
-    console.log("Attempting to buy property with id:", propertyId); // Debug log
-    console.log("Current available properties:", availableProperties); // Debug log
 
     const property = availableProperties.find((p) => p.id === propertyId);
     if (!property) {
-      console.log("Property not found in available properties"); // Debug log
       Alert.alert("Error", "Property not found.");
       return;
     }
@@ -330,9 +326,6 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       setOwnedProperties(newOwnedProperties);
       setAvailableProperties(newAvailableProperties);
       
-      console.log("Properties updated:"); // Debug log
-      console.log("New owned properties:", newOwnedProperties); // Debug log
-      console.log("New available properties:", newAvailableProperties); // Debug log
     } catch (error) {
       console.error("Error updating properties:", error);
     }
