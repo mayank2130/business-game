@@ -1,10 +1,54 @@
-import React, { useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { useBusinessContext } from "@/lib/context";
+import { useNavigation, useRouter } from "expo-router";
 
 const App = () => {
-  const { balance, updateBalance, influence } = useBusinessContext();
+  const { balance, updateBalance, influence, currentTroubles } =
+    useBusinessContext();
+
+  const navigation = useNavigation();
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check for new troubles and notify the user
+    currentTroubles.forEach((trouble) => {
+      if (trouble.createdAt > Date.now() - 5000) {
+        // Notify for troubles created in the last 5 seconds
+        Alert.alert(
+          "New Legal Trouble!",
+          `${trouble.name}: ${trouble.description}\n\nThis will cost you $${trouble.cost} and ${trouble.influenceCost} influence points if left unresolved.`,
+          [
+            { text: "View Details", onPress: () => router.push("/troubles") },
+            { text: "Dismiss", onPress: () => {} },
+          ]
+        );
+      }
+    });
+
+    currentTroubles.forEach((trouble) => {
+      const timeLeft = 24 * 60 * 60 * 1000 - (Date.now() - trouble.createdAt);
+      if (timeLeft <= 1 * 60 * 60 * 1000) {
+        // Notify if less than 1 hour left
+        Alert.alert(
+          "Trouble Penalty Imminent!",
+          `${trouble.name} will incur penalties in less than 1 hour if not resolved!`,
+          [
+            { text: "Resolve Now", onPress: () => router.push("/troubles") },
+            { text: "Dismiss", onPress: () => {} },
+          ]
+        );
+      }
+    });
+  }, [currentTroubles]);
 
   return (
     <>
@@ -45,6 +89,14 @@ const App = () => {
         </Text>
         <Text>Influence: {influence}</Text>
       </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push("/troubles")}
+        style={styles.troublesButton}
+      >
+        <Text style={styles.troublesButtonText}>
+          View Legal Troubles ({currentTroubles.length})
+        </Text>
+      </TouchableOpacity>
     </>
   );
 };
@@ -54,6 +106,19 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 10,
   },
+  troublesButton: {
+    backgroundColor: "#FF3B30",
+    padding: 10,
+    borderRadius: 5,
+    margin: 20,
+    alignItems: "center",
+  },
+  troublesButtonText: {
+    color: "#ffffff",
+    fontWeight: "bold",
+    fontSize: 16,
+  },
+
   footerNextTxt: {
     fontFamily: "mon",
     color: "#ffffff",

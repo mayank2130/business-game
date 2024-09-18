@@ -1,14 +1,33 @@
-import React, { createContext, useState, useEffect, useContext } from "react";
+import React, {
+  createContext,
+  useState,
+  useEffect,
+  useContext,
+  useCallback,
+} from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BusinessOptions, OptionLevels } from "@/constants/Business";
 import { Alert } from "react-native";
 import { personalPropertyData, Property } from "@/constants/Property";
+import { getLegalTroubles, LegalTrouble } from "@/constants/Troubles";
 
 export const BALANCE_KEY = "@game_full_balance";
 export const BUSINESSES_KEY = "@game_businesses";
 export const INFLUENCE_KEY = "@game_influence";
 export const LOANS_KEY = "@game_loans";
 export const PROPERTIES_KEY = "@game_properties";
+export const TROUBLES_KEY = "@game_new_troubles_laws";
+export const MAX_TROUBLES = 3;
+
+
+// const MAX_TROUBLES = 3;
+const MIN_TROUBLE_INTERVAL = 30 * 60 * 1000; // 30 minutes in milliseconds
+const MAX_TROUBLE_INTERVAL = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
+// For testing purposes, use these values instead:
+// const MIN_TROUBLE_INTERVAL = 10 * 1000; // 10 seconds
+// const MAX_TROUBLE_INTERVAL = 10 * 1000; // 10 seconds
+
 
 interface Business {
   id: string;
@@ -55,6 +74,9 @@ interface BusinessContextType {
   ) => Promise<void>;
   getLoan: (loanOption: LoanOption) => Promise<void>;
   repayLoan: (loanId: string) => Promise<void>;
+  currentTroubles: LegalTrouble[];
+  handleLegalTroubles: () => void;
+  resolveTrouble: (troubleId: string, optionIndex: number) => void;
 }
 
 const BusinessContext = createContext<BusinessContextType | undefined>(
@@ -72,43 +94,137 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [influence, setInfluence] = useState<number>(0);
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [currentTroubles, setCurrentTroubles] = useState<LegalTrouble[]>([]);
+  const [lastTroubleCheck, setLastTroubleCheck] = useState<number>(Date.now());
+  const [nextTroubleCheck, setNextTroubleCheck] = useState<number>(Date.now() + MIN_TROUBLE_INTERVAL);
 
-  useEffect(() => {
-    const loadData = async () => {
-      try {
-        const storedBalance = await AsyncStorage.getItem(BALANCE_KEY);
-        const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
-        const storedProperties = await AsyncStorage.getItem(PROPERTIES_KEY);
-        const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
-        const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
+  const loadData = useCallback(async () => {
+    try {
+      const storedBalance = await AsyncStorage.getItem(BALANCE_KEY);
+      const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
+      const storedProperties = await AsyncStorage.getItem(PROPERTIES_KEY);
+      const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
+      const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
+      const storedTroubles = await AsyncStorage.getItem(TROUBLES_KEY);
 
-        if (storedBalance !== null) setBalance(parseFloat(storedBalance));
-        if (storedBusinesses !== null)
-          setOwnedBusinesses(JSON.parse(storedBusinesses));
-        const allProperties = personalPropertyData;
-        
-        if (storedProperties !== null) {
-          const ownedPropertyIds = JSON.parse(storedProperties);
-
-          setOwnedProperties(allProperties.filter((p: Property) => ownedPropertyIds.includes(p.id)));
-          setAvailableProperties(allProperties.filter((p: Property) => !ownedPropertyIds.includes(p.id)));
-        } else {
-          setOwnedProperties([]);
-          setAvailableProperties(allProperties);
-        }
-
-        if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
-        if (storedLoans !== null) setLoans(JSON.parse(storedLoans));
-      } catch (error) {
-        console.error("Error loading data:", error);
+      if (storedTroubles !== null) {
+        setCurrentTroubles(JSON.parse(storedTroubles));
       }
-    };
+      if (storedBalance !== null) setBalance(parseFloat(storedBalance));
+      if (storedBusinesses !== null)
+        setOwnedBusinesses(JSON.parse(storedBusinesses));
+      if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
+      if (storedLoans !== null) setLoans(JSON.parse(storedLoans));
 
-    loadData();
+      const allProperties = personalPropertyData;
+      if (storedProperties !== null) {
+        const ownedPropertyIds = JSON.parse(storedProperties);
+        setOwnedProperties(
+          allProperties.filter((p: Property) => ownedPropertyIds.includes(p.id))
+        );
+        setAvailableProperties(
+          allProperties.filter(
+            (p: Property) => !ownedPropertyIds.includes(p.id)
+          )
+        );
+      } else {
+        setOwnedProperties([]);
+        setAvailableProperties(allProperties);
+      }
+    } catch (error) {
+      console.error("Error loading data:", error);
+    }
   }, []);
 
   useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+const handleLegalTroubles = useCallback(() => {
+    const now = Date.now();
+    if (now < nextTroubleCheck || currentTroubles.length >= MAX_TROUBLES) return;
+
+    const troubles = getLegalTroubles();
+    const scaleFactor = Math.log(balance + influence + 1) / Math.log(10);
+
+    let newTrouble: LegalTrouble | null = null;
+
+    for (const trouble of troubles) {
+      const scaledProbability = trouble.probability * scaleFactor;
+      if (Math.random() < scaledProbability && !currentTroubles.some(t => t.id.split('-')[0] === trouble.id)) {
+        newTrouble = { 
+          ...trouble, 
+          id: `${trouble.id}-${now}`,
+          createdAt: now 
+        };
+        break;
+      }
+    }
+
+    if (newTrouble) {
+      setCurrentTroubles(prev => {
+        const updated = [...prev, newTrouble!];
+        AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(updated));
+        return updated;
+      });
+
+      Alert.alert(
+        'New Legal Trouble!',
+        `${newTrouble.name}: ${newTrouble.description}\n\nThis will cost you $${newTrouble.cost} and ${newTrouble.influenceCost} influence points if left unresolved.`,
+        [{ text: 'View Details', onPress: () => {} }]
+      );
+    }
+
+    // Schedule next check
+    const nextCheck = now + Math.floor(Math.random() * (MAX_TROUBLE_INTERVAL - MIN_TROUBLE_INTERVAL) + MIN_TROUBLE_INTERVAL);
+    setNextTroubleCheck(nextCheck);
+    setLastTroubleCheck(now);
+  }, [balance, influence, currentTroubles]);
+
+
+  const resolveTrouble = useCallback(
+    (troubleId: string, optionIndex: number) => {
+      const troubleIndex = currentTroubles.findIndex((t) => t.id === troubleId);
+      if (troubleIndex === -1) return;
+
+      const trouble = currentTroubles[troubleIndex];
+      const option = trouble.resolutionOptions[optionIndex];
+      if (!option) return;
+
+      if (balance < option.cost || influence < option.influenceCost) {
+        Alert.alert(
+          "Error",
+          "Insufficient funds or influence to resolve this trouble."
+        );
+        return;
+      }
+
+      if (Math.random() < option.successProbability) {
+        setCurrentTroubles((prev) => {
+          const updated = prev.filter((t) => t.id !== troubleId);
+          AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(updated));
+          return updated;
+        });
+        setBalance((prev) => prev - option.cost);
+        setInfluence((prev) => prev - option.influenceCost);
+        Alert.alert(
+          "Success",
+          `You successfully resolved the ${trouble.name} using the "${option.name}" approach.`
+        );
+      } else {
+        Alert.alert(
+          "Failure",
+          `Your attempt to resolve the ${trouble.name} using the "${option.name}" approach has failed. The trouble remains.`
+        );
+      }
+    },
+    [currentTroubles, balance, influence]
+  );
+
+  useEffect(() => {
     const updateInterval = 1000; // Update every second
+    const maxTroubleCheckInterval = 10000; // Check for new troubles every 10 seconds
+
     const timer = setInterval(() => {
       const totalIncome = getTotalIncome() + getTotalRentalIncome();
       const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
@@ -137,10 +253,45 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       updateBalance(newBalance);
-    }, updateInterval);
 
-    return () => clearInterval(timer);
-  }, [balance, ownedBusinesses, ownedProperties, loans]);
+      // Check and update troubles
+      const updatedTroubles = currentTroubles
+        .map((trouble) => {
+          const troubleDuration = Date.now() - trouble.createdAt;
+          if (troubleDuration >= 24 * 60 * 60 * 1000) {
+            // 24 hours in milliseconds
+            // Apply penalties for unresolved troubles
+            newBalance -= trouble.cost;
+            setInfluence((prevInfluence) => {
+              const newInfluence = Math.max(
+                0,
+                prevInfluence - trouble.influenceCost
+              );
+              AsyncStorage.setItem(INFLUENCE_KEY, newInfluence.toString());
+              return newInfluence;
+            });
+            Alert.alert(
+              "Trouble Penalty",
+              `You've incurred penalties for not resolving ${trouble.name}. $${trouble.cost} deducted and ${trouble.influenceCost} influence lost.`
+            );
+            return null; // Remove this trouble
+          }
+          return trouble;
+        })
+        .filter(Boolean) as LegalTrouble[];
+
+      if (updatedTroubles.length !== currentTroubles.length) {
+        setCurrentTroubles(updatedTroubles);
+        AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(updatedTroubles));
+      }
+      handleLegalTroubles();
+    }, 1000);
+  
+    return () => {
+      clearInterval(timer);
+      // No need to clear the trouble timer as it's using setTimeout
+    };
+  }, [balance, ownedBusinesses, ownedProperties, loans, currentTroubles, handleLegalTroubles]);
 
   const updateBalance = async (newBalance: number) => {
     try {
@@ -288,7 +439,6 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
   const buyProperty = async (propertyId: string) => {
-
     const property = availableProperties.find((p) => p.id === propertyId);
     if (!property) {
       Alert.alert("Error", "Property not found.");
@@ -321,11 +471,13 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     newAvailableProperties: Property[]
   ) => {
     try {
-      const ownedPropertyIds = newOwnedProperties.map(p => p.id);
-      await AsyncStorage.setItem(PROPERTIES_KEY, JSON.stringify(ownedPropertyIds));
+      const ownedPropertyIds = newOwnedProperties.map((p) => p.id);
+      await AsyncStorage.setItem(
+        PROPERTIES_KEY,
+        JSON.stringify(ownedPropertyIds)
+      );
       setOwnedProperties(newOwnedProperties);
       setAvailableProperties(newAvailableProperties);
-      
     } catch (error) {
       console.error("Error updating properties:", error);
     }
@@ -349,7 +501,63 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     await updateProperties(newOwnedProperties, newAvailableProperties);
 
     Alert.alert("Success", `${property.location} sold for $${property.price}.`);
-  }
+  };
+
+  // const handleLegalTroubles = () => {
+  //   if (currentTroubles.length >= MAX_TROUBLES) return; // Limit the number of concurrent troubles
+
+  //   const troubles = getLegalTroubles();
+  //   const scaleFactor = Math.log(balance + influence + 1) / Math.log(10); // Logarithmic scaling
+
+  //   troubles.forEach(trouble => {
+  //     const scaledProbability = trouble.probability * scaleFactor;
+  //     if (Math.random() < scaledProbability && !currentTroubles.some(t => t.id === trouble.id)) {
+  //       const newTrouble: LegalTrouble = { ...trouble, createdAt: Date.now() };
+  //       setCurrentTroubles(prev => [...prev, newTrouble]);
+  //       Alert.alert(
+  //         "New Legal Trouble!",
+  //         `${trouble.name}: ${trouble.description}\n\nThis will cost you $${trouble.cost} and ${trouble.influenceCost} influence points if left unresolved.`,
+  //         [
+  //           { text: "View Details", onPress: () => {} }, // You can add navigation to a detailed view here
+  //         ]
+  //       );
+  //     }
+  //   });
+
+  //   // Save updated troubles to AsyncStorage
+  //   AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(currentTroubles));
+  // };
+
+  // const resolveTrouble = async (troubleId: string, optionIndex: number) => {
+  //   const troubleIndex = currentTroubles.findIndex(t => t.id === troubleId);
+  //   if (troubleIndex === -1) return;
+
+  //   const trouble = currentTroubles[troubleIndex];
+  //   const option = trouble.resolutionOptions[optionIndex];
+  //   if (!option) return;
+
+  //   if (balance < option.cost || influence < option.influenceCost) {
+  //     Alert.alert("Error", "Insufficient funds or influence to resolve this trouble.");
+  //     return;
+  //   }
+
+  //   const newBalance = balance - option.cost;
+  //   const newInfluence = influence - option.influenceCost;
+
+  //   await updateBalance(newBalance);
+  //   await AsyncStorage.setItem(INFLUENCE_KEY, newInfluence.toString());
+  //   setInfluence(newInfluence);
+
+  //   if (Math.random() < option.successProbability) {
+  //     Alert.alert("Success", `You successfully resolved the ${trouble.name} using the "${option.name}" approach.`);
+  //     setCurrentTroubles(prev => prev.filter(t => t.id !== troubleId));
+  //   } else {
+  //     Alert.alert("Failure", `Your attempt to resolve the ${trouble.name} using the "${option.name}" approach has failed. The trouble remains.`);
+  //   }
+
+  //   // Save updated troubles to AsyncStorage
+  //   AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(currentTroubles));
+  // };
 
   return (
     <BusinessContext.Provider
@@ -372,6 +580,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         increaseInfluence,
         getLoan,
         repayLoan,
+        currentTroubles,
+        handleLegalTroubles,
+        resolveTrouble,
       }}
     >
       {children}

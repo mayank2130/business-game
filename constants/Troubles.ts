@@ -1,4 +1,4 @@
-interface LegalTrouble {
+export interface LegalTrouble {
     id: string;
     name: string;
     description: string;
@@ -9,7 +9,7 @@ interface LegalTrouble {
     createdAt: number;
   }
   
-  interface ResolutionOption {
+ export interface ResolutionOption {
     name: string;
     cost: number;
     influenceCost: number;
@@ -17,7 +17,7 @@ interface LegalTrouble {
   }
 
   
-  const getLegalTroubles = (): Omit<LegalTrouble, 'createdAt'>[] => {
+ export const getLegalTroubles = (): Omit<LegalTrouble, 'createdAt'>[] => {
     return [
       {
         id: "1",
