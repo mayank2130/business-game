@@ -22,8 +22,8 @@ export const MAX_TROUBLES = 3;
 
 // const MAX_TROUBLES = 3;
 const MIN_TROUBLE_INTERVAL = 30 * 60 * 1000; // 30 minutes in milliseconds
-const MAX_TROUBLE_INTERVAL = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
-
+const MAX_TROUBLE_INTERVAL = 14 * 60 * 60 * 1000; // 14 hours in milliseconds
+const TROUBLE_BALANCE_THRESHOLD = 15000000;
 // For testing purposes, use these values instead:
 // const MIN_TROUBLE_INTERVAL = 10 * 1000; // 10 seconds
 // const MAX_TROUBLE_INTERVAL = 10 * 1000; // 10 seconds
@@ -140,9 +140,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     loadData();
   }, [loadData]);
 
-const handleLegalTroubles = useCallback(() => {
+  const handleLegalTroubles = useCallback(() => {
     const now = Date.now();
-    if (now < nextTroubleCheck || currentTroubles.length >= MAX_TROUBLES) return;
+    if (now < nextTroubleCheck || currentTroubles.length >= MAX_TROUBLES || balance < TROUBLE_BALANCE_THRESHOLD) return;
 
     const troubles = getLegalTroubles();
     const scaleFactor = Math.log(balance + influence + 1) / Math.log(10);
@@ -179,8 +179,7 @@ const handleLegalTroubles = useCallback(() => {
     const nextCheck = now + Math.floor(Math.random() * (MAX_TROUBLE_INTERVAL - MIN_TROUBLE_INTERVAL) + MIN_TROUBLE_INTERVAL);
     setNextTroubleCheck(nextCheck);
     setLastTroubleCheck(now);
-  }, [balance, influence, currentTroubles]);
-
+  }, [balance, influence, currentTroubles, nextTroubleCheck]);
 
   const resolveTrouble = useCallback(
     (troubleId: string, optionIndex: number) => {
