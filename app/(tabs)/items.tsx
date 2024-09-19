@@ -10,11 +10,14 @@ import {
 } from "react-native";
 import React from "react";
 import { LinearGradient } from "expo-linear-gradient";
+import { useRouter } from "expo-router";
 
 export default function ElevatedCards() {
   function openWebsite(websiteLink: string) {
     Linking.openURL(websiteLink);
   }
+
+  const router = useRouter()
 
   return (
     <View style={{ backgroundColor: "#fff" }}>
@@ -25,16 +28,18 @@ export default function ElevatedCards() {
           </Text> */}
           <ScrollView horizontal={true} style={[styles.container]}>
             <View style={[styles.card, styles.cardElevated]}>
-              <Image
-                source={require("../../assets/images/cars.jpg")}
-                style={{
-                  height: 130,
-                  width: 130,
-                  borderRadius: 8,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              />
+              <TouchableOpacity onPress={() => router.push("/items/cars")} activeOpacity={1}>
+                <Image
+                  source={require("../../assets/images/cars.jpg")}
+                  style={{
+                    height: 130,
+                    width: 130,
+                    borderRadius: 8,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                />
+              </TouchableOpacity>
             </View>
             <View style={[styles.card, styles.cardElevated]}>
               <TouchableOpacity activeOpacity={1}>
@@ -120,19 +125,23 @@ export default function ElevatedCards() {
                 end={{ x: 1, y: 1 }}
                 style={styles.gradient}
               >
-              <View style={[styles.container]}>
-                <View style={[styles.cardTwo]}>
-                  <TouchableOpacity style={styles.innerCard}>
-                    <Image source={require("../../assets/images/car.png")} />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.innerCard}>
-                    <Image source={require("../../assets/images/plane.png")} />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.innerCard}>
-                    <Image source={require("../../assets/images/yacht.png")} />
-                  </TouchableOpacity>
+                <View style={[styles.container]}>
+                  <View style={[styles.cardTwo]}>
+                    <TouchableOpacity style={styles.innerCard}>
+                      <Image source={require("../../assets/images/car.png")} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.innerCard}>
+                      <Image
+                        source={require("../../assets/images/plane.png")}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.innerCard}>
+                      <Image
+                        source={require("../../assets/images/yacht.png")}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
               </LinearGradient>
             </View>
           </View>
@@ -147,27 +156,27 @@ export default function ElevatedCards() {
                 end={{ x: 1, y: 1 }}
                 style={styles.gradient}
               >
-              <View style={[styles.container]}>
-                <View style={styles.cardTwo}>
-                  <TouchableOpacity style={styles.innerCard}>
-                    <Image
-                      source={require("../../assets/images/suit.png")}
-                      style={{ width: 40, height: 50 }}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.innerCard}>
-                    <Image
-                      source={require("../../assets/images/watches.png")}
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.innerCard}>
-                    <Image
-                      source={require("../../assets/images/shoe.png")}
-                      style={{ width: 40, height: 50 }}
-                    />
-                  </TouchableOpacity>
+                <View style={[styles.container]}>
+                  <View style={styles.cardTwo}>
+                    <TouchableOpacity style={styles.innerCard}>
+                      <Image
+                        source={require("../../assets/images/suit.png")}
+                        style={{ width: 40, height: 50 }}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.innerCard}>
+                      <Image
+                        source={require("../../assets/images/watches.png")}
+                      />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.innerCard}>
+                      <Image
+                        source={require("../../assets/images/shoe.png")}
+                        style={{ width: 40, height: 50 }}
+                      />
+                    </TouchableOpacity>
+                  </View>
                 </View>
-              </View>
               </LinearGradient>
             </View>
           </View>

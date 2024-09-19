@@ -51,7 +51,7 @@ const STATUSBAR_HEIGHT = Platform.OS === "ios" ? 10 : StatusBar.currentHeight;
 
 function RootLayoutNav() {
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#000000" }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#000000", }}>
       {/* <View
         style={{
           paddingTop: STATUSBAR_HEIGHT,
