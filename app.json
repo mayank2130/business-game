@@ -4,11 +4,11 @@
     "slug": "business-empire",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/dollar-icon.png",
+    "icon": "./assets/images/dollar-logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/dollar-splash.png",
+      "image": "./assets/images/dollar-logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#FFD700"
     },
@@ -18,7 +18,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/dollar-adaptive-icon.png",
+        "foregroundImage": "./assets/images/dollar-logo.png",
         "backgroundColor": "#FFD700"
       },
       "package": "com.mayank2310.businessempire"
@@ -26,11 +26,9 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/dollar-favicon.png"
+      "favicon": "./assets/images/dollar-logo.png"
     },
-    "plugins": [
-      "expo-router"
-    ],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true
     },
