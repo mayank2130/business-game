@@ -2,8 +2,11 @@ import { BusinessProvider } from "@/lib/context";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+// import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
+import { Platform, View, StatusBar, Text } from "react-native";
 import "react-native-reanimated";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -44,15 +47,25 @@ export default function RootLayout() {
   return <RootLayoutNav />;
 }
 
+const STATUSBAR_HEIGHT = Platform.OS === "ios" ? 10 : StatusBar.currentHeight;
+
 function RootLayoutNav() {
-
   return (
-    <BusinessProvider>
-
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="modal" options={{ presentation: "modal" }} />
-      </Stack>
-    </BusinessProvider>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#000000" }}>
+      {/* <View
+        style={{
+          paddingTop: STATUSBAR_HEIGHT,
+          flex: 1,
+          backgroundColor: "white",
+        }}
+      > */}
+        <BusinessProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: "modal" }} />
+          </Stack>
+        </BusinessProvider>
+      {/* </View> */}
+    </SafeAreaView>
   );
 }
