@@ -1,4 +1,4 @@
-export interface Property {
+export interface Cars {
   id: string;
   price: number;
   owned: boolean;
@@ -6,7 +6,7 @@ export interface Property {
   source: number; // Assuming 'source' is of type number (require statement)
 }
 
-export const personalPropertyData: Property[] = [
+export const carsData: Cars[] = [
   {
     id: "1",
     owned: false,
@@ -18,7 +18,7 @@ export const personalPropertyData: Property[] = [
     id: "2",
     owned: false,
     maintainance: 122000,
-    price: 300000000,
+    price: 100000000,
     source: require("../assets/images/image.png"),
   },
   {

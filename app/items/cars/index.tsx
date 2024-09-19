@@ -1,8 +1,16 @@
-import { Image, ImageBackground, StyleSheet, Text, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  ImageBackground,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import React, { useLayoutEffect } from "react";
 import { useNavigation } from "expo-router";
+import { Cars, carsData } from "@/constants/Cars";
 
-const Cars = () => {
+const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
   const navigation = useNavigation();
 
   useLayoutEffect(() => {
@@ -24,7 +32,7 @@ const Cars = () => {
       }}
     >
       <Image
-        source={require("../../../assets/images/image.png")}
+        source={item.source}
         style={{
           height: 120,
           width: 300,
@@ -33,16 +41,32 @@ const Cars = () => {
           alignItems: "center",
         }}
       />
-      <View>
+      <View style={{ paddingTop: 10 }}>
         <Text style={{ fontSize: 17, fontFamily: "mon-sb" }}>
           Mclaren Formula 1 Car
         </Text>
-        <Text style={{ fontFamily: "mon", fontSize: 14 }}>Price from $ 10,000,000</Text>
+        <Text style={{ fontFamily: "mon", fontSize: 14 }}>
+          Price: $ {item.price.toLocaleString()}
+        </Text>
       </View>
     </View>
   );
 };
 
-export default Cars;
+const CarsList: React.FC = () => {
+  const cars = carsData;
+
+  return (
+    <View style={{ flex: 1, alignItems: "center", paddingVertical: 10 }}>
+      <FlatList
+        data={cars}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <CarsCard item={item} />}
+      />
+    </View>
+  );
+};
+
+export default CarsList;
 
 const styles = StyleSheet.create({});
