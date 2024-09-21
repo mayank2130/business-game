@@ -12,8 +12,13 @@ import { useBusinessContext } from "@/lib/context";
 import { useNavigation, useRouter } from "expo-router";
 
 const App = () => {
-  const { balance, updateBalance, influence, currentTroubles } =
-    useBusinessContext();
+  const {
+    balance,
+    updateBalance,
+    influence,
+    currentTroubles,
+    getTotalCarMaintainace,
+  } = useBusinessContext();
 
   const navigation = useNavigation();
   const router = useRouter();
@@ -78,6 +83,17 @@ const App = () => {
             <Text style={[styles.footerNextTxt]}>per click</Text>
           </View>
         </View>
+        <Text
+          style={[
+            styles.balanceTxt,
+            { letterSpacing: 1, color: "black", fontSize: 20 },
+          ]}
+        >
+          Expenses:
+        </Text>
+        <Text style={[styles.balanceTxt, { color: "red", paddingLeft: 10 }]}>
+          - $ {getTotalCarMaintainace().toLocaleString()}
+        </Text>
       </View>
       <TouchableOpacity
         onPress={() => updateBalance(balance + 2000000000)}

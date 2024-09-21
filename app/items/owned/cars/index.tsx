@@ -31,7 +31,7 @@ const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
         <View style={styles.cardDetails}>
           <Text
             style={{
-              fontSize: 18,
+              fontSize: 17,
               fontFamily: "mon-sb",
               width: 210,
               paddingLeft: 10,
@@ -47,7 +47,7 @@ const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
           <Text
             style={[
               styles.price,
-              { fontSize: 15, fontFamily: "mon", color: "red" },
+              { fontSize: 14, fontFamily: "mon", color: "red" },
             ]}
           >
             Maintance: $ {item.maintainance.toLocaleString()}
@@ -110,8 +110,7 @@ const OwnedCarsList: React.FC = () => {
 
 const styles = StyleSheet.create({
   card: {
-    width: 350,
-    height: 310,
+    width: 360,
     borderRadius: 10,
     marginVertical: 10,
     marginHorizontal: 16,
@@ -123,8 +122,8 @@ const styles = StyleSheet.create({
     },
   },
   cardImage: {
-    height: 200,
-    width: 350,
+    height: 180,
+    width: 360,
     borderTopLeftRadius: 10,
     borderTopRightRadius: 10,
   },
@@ -134,7 +133,7 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   price: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "mon-sb",
     paddingLeft: 10,
     paddingBottom: 3,
