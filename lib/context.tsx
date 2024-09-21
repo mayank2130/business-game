@@ -516,7 +516,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
     Alert.alert(
       "Success",
-      `${property.location} purchased for $${property.price}.`
+      `${property.location} purchased for $${property.price.toLocaleString()}.`
     );
   };
 
@@ -582,7 +582,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
     Alert.alert(
       "Success",
-      `${car.id} purchased for $${car.price}.`
+      `${car.name} purchased for $${car.price.toLocaleString()}.`
     );
   };
 
