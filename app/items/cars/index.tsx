@@ -42,34 +42,51 @@ const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
       <Image
         source={item.source}
         style={{
-          height: 120,
-          width: 300,
+          height: 160,
+          width: 315,
           borderRadius: 10,
           justifyContent: "center",
           alignItems: "center",
         }}
       />
-      <View style={{ paddingTop: 10 }}>
-        <Text style={{ fontSize: 17, fontFamily: "mon-sb" }}>
-          Mclaren Formula 1 Car
-        </Text>
-        <Text style={{ fontFamily: "mon", fontSize: 14 }}>
-          Price: $ {item.price.toLocaleString()}
-        </Text>
+      <View style={{ paddingTop: 10, flexDirection: "row" }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View>
+            <Text
+              style={{
+                fontSize: 17,
+                fontFamily: "mon-sb",
+                width: 210,
+                flexWrap: "nowrap",
+              }}
+            >
+              {item.name}
+            </Text>
+            <Text style={{ fontFamily: "mon", fontSize: 14 }}>
+              Price: ${item.price.toLocaleString()}
+            </Text>
+            <Text style={{ fontFamily: "mon", color: "red", fontSize: 12 }}>
+              Maintainace: ${item.maintainance.toLocaleString()}
+            </Text>
+          </View>
+        </View>
+        <View style={{ flex: 1, alignItems: "flex-end" }}>
+          <TouchableOpacity
+            onPress={handleBuy}
+            disabled={balance < item.price}
+            style={styles.buyButton}
+          >
+            <Text style={styles.innerTxt}>Buy</Text>
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity
-        onPress={handleBuy}
-        disabled={balance < item.price}
-        style={styles.buyButton}
-      >
-        <Text style={styles.innerTxt}>Buy</Text>
-      </TouchableOpacity>
     </View>
   );
 };
 
 const CarsList: React.FC = () => {
-  const cars = carsData;
+  const { availableCars } = useBusinessContext();
+  const cars = availableCars;
 
   return (
     <View style={{ flex: 1, alignItems: "center", paddingVertical: 10 }}>
@@ -86,10 +103,10 @@ export default CarsList;
 
 const styles = StyleSheet.create({
   buyButton: {
-    margin: 20,
-    width: 100,
-    height: 50,
-    borderRadius: 15,
+    marginLeft: 40,
+    width: 80,
+    height: 45,
+    borderRadius: 10,
     backgroundColor: "#0070FF",
     justifyContent: "center",
     alignItems: "center",
