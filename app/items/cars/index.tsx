@@ -4,11 +4,13 @@ import {
   ImageBackground,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import React, { useLayoutEffect } from "react";
 import { useNavigation } from "expo-router";
 import { Cars, carsData } from "@/constants/Cars";
+import { useBusinessContext } from "@/lib/context";
 
 const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
   const navigation = useNavigation();
@@ -19,6 +21,12 @@ const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
       // headerTransparent: true,
     });
   }, []);
+
+  const { balance, buyCars } = useBusinessContext();
+
+  const handleBuy = () => {
+    buyCars(item.id);
+  };
 
   return (
     <View
@@ -49,6 +57,13 @@ const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
           Price: $ {item.price.toLocaleString()}
         </Text>
       </View>
+      <TouchableOpacity
+        onPress={handleBuy}
+        disabled={balance < item.price}
+        style={styles.buyButton}
+      >
+        <Text style={styles.innerTxt}>Buy</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -69,4 +84,19 @@ const CarsList: React.FC = () => {
 
 export default CarsList;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  buyButton: {
+    margin: 20,
+    width: 100,
+    height: 50,
+    borderRadius: 15,
+    backgroundColor: "#0070FF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  innerTxt: {
+    color: "white",
+    fontFamily: "mon-sb",
+    fontSize: 16,
+  },
+});

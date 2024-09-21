@@ -127,7 +127,7 @@ export default function ElevatedCards() {
               >
                 <View style={[styles.container]}>
                   <View style={[styles.cardTwo]}>
-                    <TouchableOpacity style={styles.innerCard}>
+                    <TouchableOpacity onPress={() => router.push("/items/owned/cars")} style={styles.innerCard}>
                       <Image source={require("../../assets/images/car.png")} />
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.innerCard}>

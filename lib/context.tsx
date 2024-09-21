@@ -10,6 +10,7 @@ import { BusinessOptions, OptionLevels } from "@/constants/Business";
 import { Alert } from "react-native";
 import { personalPropertyData, Property } from "@/constants/Property";
 import { getLegalTroubles, LegalTrouble } from "@/constants/Troubles";
+import { Cars, carsData } from "@/constants/Cars";
 
 export const BALANCE_KEY = "@game_full_balance";
 export const BUSINESSES_KEY = "@game_businesses";
@@ -17,8 +18,8 @@ export const INFLUENCE_KEY = "@game_influence";
 export const LOANS_KEY = "@game_loans";
 export const PROPERTIES_KEY = "@game_properties";
 export const TROUBLES_KEY = "@game_new_troubles_laws";
+export const CARS_KEY = "@game_cars";
 export const MAX_TROUBLES = 3;
-
 
 // const MAX_TROUBLES = 3;
 const MIN_TROUBLE_INTERVAL = 30 * 60 * 1000; // 30 minutes in milliseconds
@@ -27,7 +28,6 @@ const TROUBLE_BALANCE_THRESHOLD = 15000000;
 // For testing purposes, use these values instead:
 // const MIN_TROUBLE_INTERVAL = 10 * 1000; // 10 seconds
 // const MAX_TROUBLE_INTERVAL = 10 * 1000; // 10 seconds
-
 
 interface Business {
   id: string;
@@ -54,6 +54,7 @@ interface BusinessContextType {
   influence: number;
   ownedBusinesses: BusinessOptions[];
   ownedProperties: Property[];
+  ownedCars: Cars[];
   availableProperties: Property[];
   loans: Loan[];
   updateBalance: (newBalance: number) => Promise<void>;
@@ -62,12 +63,18 @@ interface BusinessContextType {
     newOwnedProperties: Property[],
     newAvailableProperties: Property[]
   ) => Promise<void>;
+  updateCars: (
+    newOwnedCars: Cars[],
+    newAvailableCars: Cars[]
+  ) => Promise<void>;
   increaseBusinessLevel: (businessId: string) => Promise<void>;
   getCurrentIncome: (businessId: string) => number;
   getTotalIncome: () => number;
   getTotalRentalIncome: () => number;
   sellProperty: (propertyId: string) => Promise<void>;
   buyProperty: (propertyId: string) => Promise<void>;
+  sellCars: (carId: string) => Promise<void>;
+  buyCars: (carId: string) => Promise<void>;
   increaseInfluence: (
     influenceCost: number,
     influenceAmount: number
@@ -92,11 +99,16 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   const [availableProperties, setAvailableProperties] = useState<Property[]>(
     []
   );
+  const [ownedCars, setOwnedCars] = useState<Cars[]>([]);
+  const [availableCars, setAvailableCars] = useState<Cars[]>([]);
+
   const [influence, setInfluence] = useState<number>(0);
   const [loans, setLoans] = useState<Loan[]>([]);
   const [currentTroubles, setCurrentTroubles] = useState<LegalTrouble[]>([]);
   const [lastTroubleCheck, setLastTroubleCheck] = useState<number>(Date.now());
-  const [nextTroubleCheck, setNextTroubleCheck] = useState<number>(Date.now() + MIN_TROUBLE_INTERVAL);
+  const [nextTroubleCheck, setNextTroubleCheck] = useState<number>(
+    Date.now() + MIN_TROUBLE_INTERVAL
+  );
 
   const loadData = useCallback(async () => {
     try {
@@ -106,6 +118,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
       const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
       const storedTroubles = await AsyncStorage.getItem(TROUBLES_KEY);
+      const storedCars = await AsyncStorage.getItem(CARS_KEY);
 
       if (storedTroubles !== null) {
         setCurrentTroubles(JSON.parse(storedTroubles));
@@ -115,6 +128,18 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         setOwnedBusinesses(JSON.parse(storedBusinesses));
       if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
       if (storedLoans !== null) setLoans(JSON.parse(storedLoans));
+
+      const allCars = carsData;
+      if (storedCars !== null) {
+        const ownedCarIds = JSON.parse(storedCars);
+        setOwnedCars(allCars.filter((p: Cars) => ownedCarIds.includes(p.id)));
+        setAvailableCars(
+          allCars.filter((p: Cars) => !ownedCarIds.includes(p.id))
+        );
+      } else {
+        setOwnedCars([]);
+        setAvailableCars(allCars);
+      }
 
       const allProperties = personalPropertyData;
       if (storedProperties !== null) {
@@ -142,7 +167,12 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handleLegalTroubles = useCallback(() => {
     const now = Date.now();
-    if (now < nextTroubleCheck || currentTroubles.length >= MAX_TROUBLES || balance < TROUBLE_BALANCE_THRESHOLD) return;
+    if (
+      now < nextTroubleCheck ||
+      currentTroubles.length >= MAX_TROUBLES ||
+      balance < TROUBLE_BALANCE_THRESHOLD
+    )
+      return;
 
     const troubles = getLegalTroubles();
     const scaleFactor = Math.log(balance + influence + 1) / Math.log(10);
@@ -151,32 +181,40 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
     for (const trouble of troubles) {
       const scaledProbability = trouble.probability * scaleFactor;
-      if (Math.random() < scaledProbability && !currentTroubles.some(t => t.id.split('-')[0] === trouble.id)) {
-        newTrouble = { 
-          ...trouble, 
+      if (
+        Math.random() < scaledProbability &&
+        !currentTroubles.some((t) => t.id.split("-")[0] === trouble.id)
+      ) {
+        newTrouble = {
+          ...trouble,
           id: `${trouble.id}-${now}`,
-          createdAt: now 
+          createdAt: now,
         };
         break;
       }
     }
 
     if (newTrouble) {
-      setCurrentTroubles(prev => {
+      setCurrentTroubles((prev) => {
         const updated = [...prev, newTrouble!];
         AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(updated));
         return updated;
       });
 
       Alert.alert(
-        'New Legal Trouble!',
+        "New Legal Trouble!",
         `${newTrouble.name}: ${newTrouble.description}\n\nThis will cost you $${newTrouble.cost} and ${newTrouble.influenceCost} influence points if left unresolved.`,
-        [{ text: 'View Details', onPress: () => {} }]
+        [{ text: "View Details", onPress: () => {} }]
       );
     }
 
     // Schedule next check
-    const nextCheck = now + Math.floor(Math.random() * (MAX_TROUBLE_INTERVAL - MIN_TROUBLE_INTERVAL) + MIN_TROUBLE_INTERVAL);
+    const nextCheck =
+      now +
+      Math.floor(
+        Math.random() * (MAX_TROUBLE_INTERVAL - MIN_TROUBLE_INTERVAL) +
+          MIN_TROUBLE_INTERVAL
+      );
     setNextTroubleCheck(nextCheck);
     setLastTroubleCheck(now);
   }, [balance, influence, currentTroubles, nextTroubleCheck]);
@@ -285,12 +323,20 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       }
       handleLegalTroubles();
     }, 1000);
-  
+
     return () => {
       clearInterval(timer);
       // No need to clear the trouble timer as it's using setTimeout
     };
-  }, [balance, ownedBusinesses, ownedProperties, loans, currentTroubles, handleLegalTroubles]);
+  }, [
+    balance,
+    ownedCars,
+    ownedBusinesses,
+    ownedProperties,
+    loans,
+    currentTroubles,
+    handleLegalTroubles,
+  ]);
 
   const updateBalance = async (newBalance: number) => {
     try {
@@ -489,7 +535,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     }
 
-    const newBalance = balance + property.price;
+    const newBalance = balance + property.price * 0.7;
     await updateBalance(newBalance);
 
     const newOwnedProperties = ownedProperties.filter(
@@ -502,61 +548,71 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     Alert.alert("Success", `${property.location} sold for $${property.price}.`);
   };
 
-  // const handleLegalTroubles = () => {
-  //   if (currentTroubles.length >= MAX_TROUBLES) return; // Limit the number of concurrent troubles
 
-  //   const troubles = getLegalTroubles();
-  //   const scaleFactor = Math.log(balance + influence + 1) / Math.log(10); // Logarithmic scaling
+  const buyCars = async (carId: string) => {
+    const car = availableCars.find((p) => p.id === carId);
+    if (!car) {
+      Alert.alert("Error", "Car not found.");
+      return;
+    }
 
-  //   troubles.forEach(trouble => {
-  //     const scaledProbability = trouble.probability * scaleFactor;
-  //     if (Math.random() < scaledProbability && !currentTroubles.some(t => t.id === trouble.id)) {
-  //       const newTrouble: LegalTrouble = { ...trouble, createdAt: Date.now() };
-  //       setCurrentTroubles(prev => [...prev, newTrouble]);
-  //       Alert.alert(
-  //         "New Legal Trouble!",
-  //         `${trouble.name}: ${trouble.description}\n\nThis will cost you $${trouble.cost} and ${trouble.influenceCost} influence points if left unresolved.`,
-  //         [
-  //           { text: "View Details", onPress: () => {} }, // You can add navigation to a detailed view here
-  //         ]
-  //       );
-  //     }
-  //   });
+    if (balance < car.price) {
+      Alert.alert("Error", "Insufficient balance to buy this property.");
+      return;
+    }
 
-  //   // Save updated troubles to AsyncStorage
-  //   AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(currentTroubles));
-  // };
+    const newBalance = balance - car.price;
+    await updateBalance(newBalance);
 
-  // const resolveTrouble = async (troubleId: string, optionIndex: number) => {
-  //   const troubleIndex = currentTroubles.findIndex(t => t.id === troubleId);
-  //   if (troubleIndex === -1) return;
+    const newOwnedCars = [...ownedCars, car];
+    const newAvailableCars = availableCars.filter(
+      (p) => p.id !== carId
+    );
 
-  //   const trouble = currentTroubles[troubleIndex];
-  //   const option = trouble.resolutionOptions[optionIndex];
-  //   if (!option) return;
+    await updateCars(newOwnedCars, newAvailableCars);
 
-  //   if (balance < option.cost || influence < option.influenceCost) {
-  //     Alert.alert("Error", "Insufficient funds or influence to resolve this trouble.");
-  //     return;
-  //   }
+    Alert.alert(
+      "Success",
+      `${car.id} purchased for $${car.price}.`
+    );
+  };
 
-  //   const newBalance = balance - option.cost;
-  //   const newInfluence = influence - option.influenceCost;
+  const updateCars = async (
+    newOwnedCars: Cars[],
+    newAvailableCars: Cars[]
+  ) => {
+    try {
+      const ownedCarIds = newOwnedCars.map((p) => p.id);
+      await AsyncStorage.setItem(
+        CARS_KEY,
+        JSON.stringify(ownedCarIds)
+      );
+      setOwnedCars(newOwnedCars);
+      setAvailableCars(newAvailableCars);
+    } catch (error) {
+      console.error("Error updating cars:", error);
+    }
+  };
 
-  //   await updateBalance(newBalance);
-  //   await AsyncStorage.setItem(INFLUENCE_KEY, newInfluence.toString());
-  //   setInfluence(newInfluence);
+  const sellCars = async (carId: string) => {
+    const cars = ownedCars.find((p) => p.id === carId);
+    if (!cars) {
+      Alert.alert("Error", "Car not found.");
+      return;
+    }
 
-  //   if (Math.random() < option.successProbability) {
-  //     Alert.alert("Success", `You successfully resolved the ${trouble.name} using the "${option.name}" approach.`);
-  //     setCurrentTroubles(prev => prev.filter(t => t.id !== troubleId));
-  //   } else {
-  //     Alert.alert("Failure", `Your attempt to resolve the ${trouble.name} using the "${option.name}" approach has failed. The trouble remains.`);
-  //   }
+    const newBalance = balance + cars.price * 0.6;
+    await updateBalance(newBalance);
 
-  //   // Save updated troubles to AsyncStorage
-  //   AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(currentTroubles));
-  // };
+    const newOwnedCars = ownedCars.filter(
+      (p) => p.id !== carId
+    );
+    const newAvailableCars = [...availableCars, cars];
+
+    await updateCars(newOwnedCars, newAvailableCars);
+
+    Alert.alert("Success", `${cars.id} sold for $${cars.price}.`);
+  };
 
   return (
     <BusinessContext.Provider
@@ -565,17 +621,21 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         influence,
         ownedBusinesses,
         ownedProperties,
+        ownedCars,
         availableProperties,
         loans,
         updateBalance,
         updateBusinesses,
         updateProperties,
+        updateCars,
         increaseBusinessLevel,
         getCurrentIncome,
         getTotalIncome,
         getTotalRentalIncome,
         sellProperty,
         buyProperty,
+        buyCars,
+        sellCars,
         increaseInfluence,
         getLoan,
         repayLoan,
