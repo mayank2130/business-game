@@ -7,14 +7,14 @@ import {
   Text,
   View,
   FlatList,
+  Pressable,
 } from "react-native";
 import { useBusinessContext } from "@/lib/context";
 import { Cars } from "@/constants/Cars";
 import { useNavigation } from "expo-router";
 
 const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
-  
-  const navigation = useNavigation()
+  const navigation = useNavigation();
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -50,7 +50,7 @@ const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
               { fontSize: 15, fontFamily: "mon", color: "red" },
             ]}
           >
-            Maintance: $ {item.maintainance}
+            Maintance: $ {item.maintainance.toLocaleString()}
           </Text>
         </View>
         <TouchableOpacity
@@ -65,8 +65,25 @@ const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
         >
           <Text style={{ color: "white", fontFamily: "mon-sb" }}>Sell</Text>
         </TouchableOpacity>
-        <View></View>
       </View>
+      <Pressable
+        onPress={() => sellCars(item.id)}
+        style={{
+          padding: 2,
+          alignItems: "flex-end",
+          marginRight: 10,
+        }}
+      >
+        <Text
+          style={{
+            color: "blue",
+            fontFamily: "mon-sb",
+            textDecorationLine: "underline",
+          }}
+        >
+          Set as Primary
+        </Text>
+      </Pressable>
     </View>
   );
 };
@@ -96,7 +113,7 @@ const styles = StyleSheet.create({
     width: 350,
     height: 310,
     borderRadius: 10,
-    marginVertical: 12,
+    marginVertical: 10,
     marginHorizontal: 16,
     backgroundColor: "#FFFFFF",
     elevation: 5,
