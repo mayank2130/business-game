@@ -56,6 +56,7 @@ interface BusinessContextType {
   ownedProperties: Property[];
   ownedCars: Cars[];
   availableProperties: Property[];
+  availableCars:Cars[]
   loans: Loan[];
   updateBalance: (newBalance: number) => Promise<void>;
   updateBusinesses: (newBusinesses: BusinessOptions[]) => Promise<void>;
@@ -71,6 +72,7 @@ interface BusinessContextType {
   getCurrentIncome: (businessId: string) => number;
   getTotalIncome: () => number;
   getTotalRentalIncome: () => number;
+  getTotalCarMaintainace:() => number;
   sellProperty: (propertyId: string) => Promise<void>;
   buyProperty: (propertyId: string) => Promise<void>;
   sellCars: (carId: string) => Promise<void>;
@@ -263,7 +265,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     const maxTroubleCheckInterval = 10000; // Check for new troubles every 10 seconds
 
     const timer = setInterval(() => {
-      const totalIncome = getTotalIncome() + getTotalRentalIncome();
+      const totalIncome = getTotalIncome() + getTotalRentalIncome() + getTotalCarMaintainace();
       const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
       let newBalance = balance + incomePerSecond;
 
@@ -483,6 +485,13 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       0
     );
   };
+
+  const getTotalCarMaintainace = (): number => {
+    return ownedCars.reduce(
+      (total, property) => total - (property.maintainance || 0),
+      0
+    );
+  };
   const buyProperty = async (propertyId: string) => {
     const property = availableProperties.find((p) => p.id === propertyId);
     if (!property) {
@@ -623,6 +632,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         ownedProperties,
         ownedCars,
         availableProperties,
+        availableCars,
         loans,
         updateBalance,
         updateBusinesses,
@@ -632,6 +642,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         getCurrentIncome,
         getTotalIncome,
         getTotalRentalIncome,
+        getTotalCarMaintainace,
         sellProperty,
         buyProperty,
         buyCars,
