@@ -32,24 +32,31 @@ const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
     <View
       style={{
         backgroundColor: "#ffffff",
-        padding: 25,
         paddingBottom: 30,
-        paddingTop: 20,
+        width: 360,
         margin: 15,
         borderRadius: 20,
+        elevation: 5,
+        shadowOffset: {
+          width: 1,
+          height: 1,
+        },
       }}
     >
       <Image
         source={item.source}
         style={{
-          height: 160,
-          width: 315,
-          borderRadius: 10,
+          height: 180,
+          width: 360,
+          borderTopLeftRadius: 10,
+          borderTopRightRadius: 10,
           justifyContent: "center",
           alignItems: "center",
         }}
       />
-      <View style={{ paddingTop: 10, flexDirection: "row" }}>
+      <View
+        style={{ paddingTop: 10, flexDirection: "row", marginHorizontal: 25 }}
+      >
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View>
             <Text
@@ -58,11 +65,12 @@ const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
                 fontFamily: "mon-sb",
                 width: 210,
                 flexWrap: "nowrap",
+                marginBottom: 2,
               }}
             >
               {item.name}
             </Text>
-            <Text style={{ fontFamily: "mon", fontSize: 14 }}>
+            <Text style={{ fontFamily: "mon", fontSize: 14, marginBottom: 2 }}>
               Price: ${item.price.toLocaleString()}
             </Text>
             <Text style={{ fontFamily: "mon", color: "red", fontSize: 12 }}>

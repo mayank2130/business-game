@@ -1,20 +1,27 @@
 import { Entypo } from "@expo/vector-icons";
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import {
   TouchableOpacity,
   Image,
   StyleSheet,
   Text,
   View,
-  ScrollView,
   FlatList,
 } from "react-native";
-
-import type { Property } from "@/constants/Property";
 import { useBusinessContext } from "@/lib/context";
 import { Cars } from "@/constants/Cars";
+import { useNavigation } from "expo-router";
 
 const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
+  
+  const navigation = useNavigation()
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Your Cars",
+    });
+  }, []);
+
   const { sellCars } = useBusinessContext();
 
   return (
@@ -22,16 +29,29 @@ const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
       <Image source={item.source} style={styles.cardImage} />
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={styles.cardDetails}>
+          <Text
+            style={{
+              fontSize: 18,
+              fontFamily: "mon-sb",
+              width: 210,
+              paddingLeft: 10,
+              paddingBottom: 3,
+              flexWrap: "nowrap",
+            }}
+          >
+            {item.name}
+          </Text>
           <Text style={styles.price}>
-            Value: $ {item.price.toLocaleString()}
+            Value: $ {(item.price * 0.7).toLocaleString()}
           </Text>
-          <Text style={[styles.price, { fontSize: 16, fontFamily: "mon-sb" }]}>
-            Rent: $ {item.price}/hour
+          <Text
+            style={[
+              styles.price,
+              { fontSize: 15, fontFamily: "mon", color: "red" },
+            ]}
+          >
+            Maintance: $ {item.maintainance}
           </Text>
-          <View style={styles.locationContainer}>
-            <Entypo name="location" size={16} color="black" />
-            <Text style={styles.location}>{item.id}</Text>
-          </View>
         </View>
         <TouchableOpacity
           onPress={() => sellCars(item.id)}
@@ -97,8 +117,8 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   price: {
+    fontSize: 16,
     fontFamily: "mon-sb",
-    fontSize: 20,
     paddingLeft: 10,
     paddingBottom: 3,
   },
