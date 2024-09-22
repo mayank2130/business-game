@@ -26,20 +26,20 @@ const BankerRelations = () => {
     {
       id: "bankers",
       amount: 250000,
-      level: "Regional Level Politician",
-      influence: 5,
+      level: "Local Branch Managers",
+      influence: 1,
     },
     {
       id: "bankers",
-      amount: 5000000,
-      level: "State Level Politician",
+      amount: 25000000,
+      level: "Regional Bank Head's",
       influence: 2,
     },
     {
       id: "bankers",
-      amount: 15000000,
-      level: "Prime Minister",
-      influence: 1,
+      amount: 150000000,
+      level: "Large Bank CEO's",
+      influence: 5,
     },
   ];
 
