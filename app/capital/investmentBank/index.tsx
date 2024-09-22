@@ -23,15 +23,15 @@ const InvestmentBank = () => {
     });
   }, []);
 
-  const { influence } = useBusinessContext();
+  const { bankerInfluence } = useBusinessContext();
 
   let interestRate;
 
-  if (influence < 6) {
+  if (bankerInfluence < 6) {
     interestRate = [9, 8, 8, 7];
-  } else if (influence > 6 && influence < 25) {
+  } else if (bankerInfluence > 6 && bankerInfluence < 25) {
     interestRate = [7, 6, 6, 5];
-  } else if (influence > 25 && influence < 100) {
+  } else if (bankerInfluence > 25 && bankerInfluence < 100) {
     interestRate = [2, 3, 3, 3];
   } else {
     interestRate = [1, 1, 1, 0];
