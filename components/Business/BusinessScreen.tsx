@@ -81,7 +81,7 @@ export default function BusinessScreen() {
             </TouchableOpacity>
           </View>
           <View style={styles.containerTwo}>
-            <TouchableOpacity onPress={() => router.push("/capital/govtBank")}>
+            <TouchableOpacity onPress={() => router.push("/capital/mafiaCapital")}>
               <View
                 style={[
                   styles.cardFour,
@@ -100,7 +100,7 @@ export default function BusinessScreen() {
                     alignItems: "center",
                   }}
                 ></ImageBackground>
-                <Text style={styles.innerTxt}>Govt. National Bank</Text>
+                <Text style={styles.innerTxt}>Rich Oligarchs</Text>
               </View>
             </TouchableOpacity>
           </View>

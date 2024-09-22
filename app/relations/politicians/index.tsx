@@ -25,21 +25,21 @@ const PoliticianRelations = () => {
   const politicianOptions = [
     {
       id: "politician",
-      amount: 250000,
+      amount: 500000,
       level: "Regional Level Politician",
-      influence: 5,
+      influence: 1,
     },
     {
       id: "politician",
-      amount: 5000000,
+      amount: 15000000,
       level: "State Level Politician",
       influence: 2,
     },
     {
       id: "politician",
-      amount: 15000000,
+      amount: 55000000,
       level: "Prime Minister",
-      influence: 1,
+      influence: 4,
     },
   ];
 
