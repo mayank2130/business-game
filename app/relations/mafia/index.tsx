@@ -23,17 +23,14 @@ const MafiaRelations = () => {
   }, []);
 
   const mafiaRelationOptions = [
+    { id: "mafia", amount: 3000000, level: "Local Thugs", influence: 5 },
     {
-      amount: 3000000,
-      level: "Local Thugs",
-      influence: 5,
-    },
-    {
+      id: "mafia",
       amount: 25000000,
       level: "Crime Organizations",
       influence: 2,
     },
-    { amount: 50000000, level: "Russian Oligarch", influence: 1 },
+    { id: "mafia", amount: 50000000, level: "Russian Oligarch", influence: 1 },
   ];
 
   const { increaseInfluence } = useBusinessContext();
@@ -107,7 +104,7 @@ const MafiaRelations = () => {
                     <View style={styles.containerThree}>
                       <Pressable
                         onPress={() =>
-                          increaseInfluence(item.amount, item.influence)
+                          increaseInfluence(item.id ,item.amount, item.influence)
                         }
                       >
                         <View

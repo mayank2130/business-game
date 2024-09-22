@@ -24,16 +24,23 @@ const BankerRelations = () => {
 
   const bankerRelationOptions = [
     {
+      id: "bankers",
       amount: 250000,
       level: "Regional Level Politician",
       influence: 5,
     },
     {
+      id: "bankers",
       amount: 5000000,
       level: "State Level Politician",
       influence: 2,
     },
-    { amount: 15000000, level: "Prime Minister", influence: 1 },
+    {
+      id: "bankers",
+      amount: 15000000,
+      level: "Prime Minister",
+      influence: 1,
+    },
   ];
 
   const { increaseInfluence } = useBusinessContext();
@@ -107,7 +114,11 @@ const BankerRelations = () => {
                     <View style={styles.containerThree}>
                       <Pressable
                         onPress={() =>
-                          increaseInfluence(item.amount, item.influence)
+                          increaseInfluence(
+                            item.id,
+                            item.amount,
+                            item.influence
+                          )
                         }
                       >
                         <View

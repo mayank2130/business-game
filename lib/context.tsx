@@ -15,6 +15,8 @@ import { Cars, carsData } from "@/constants/Cars";
 export const BALANCE_KEY = "@game_full_balance";
 export const BUSINESSES_KEY = "@game_businesses";
 export const INFLUENCE_KEY = "@game_influence";
+export const MAFIA_INFLUENCE_KEY = "@game_mafia_influence";
+export const BANKER_INFLUENCE_KEY = "@game_banker_influence";
 export const LOANS_KEY = "@game_loans";
 export const PROPERTIES_KEY = "@game_properties";
 export const TROUBLES_KEY = "@game_new_troubles_laws";
@@ -52,11 +54,13 @@ interface Loan {
 interface BusinessContextType {
   balance: number;
   influence: number;
+  mafiaInfluence: number;
+  bankerInfluence: number;
   ownedBusinesses: BusinessOptions[];
   ownedProperties: Property[];
   ownedCars: Cars[];
   availableProperties: Property[];
-  availableCars:Cars[]
+  availableCars: Cars[];
   loans: Loan[];
   updateBalance: (newBalance: number) => Promise<void>;
   updateBusinesses: (newBusinesses: BusinessOptions[]) => Promise<void>;
@@ -64,20 +68,18 @@ interface BusinessContextType {
     newOwnedProperties: Property[],
     newAvailableProperties: Property[]
   ) => Promise<void>;
-  updateCars: (
-    newOwnedCars: Cars[],
-    newAvailableCars: Cars[]
-  ) => Promise<void>;
+  updateCars: (newOwnedCars: Cars[], newAvailableCars: Cars[]) => Promise<void>;
   increaseBusinessLevel: (businessId: string) => Promise<void>;
   getCurrentIncome: (businessId: string) => number;
   getTotalIncome: () => number;
   getTotalRentalIncome: () => number;
-  getTotalCarMaintainace:() => number;
+  getTotalCarMaintainace: () => number;
   sellProperty: (propertyId: string) => Promise<void>;
   buyProperty: (propertyId: string) => Promise<void>;
   sellCars: (carId: string) => Promise<void>;
   buyCars: (carId: string) => Promise<void>;
   increaseInfluence: (
+    id: string,
     influenceCost: number,
     influenceAmount: number
   ) => Promise<void>;
@@ -105,6 +107,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   const [availableCars, setAvailableCars] = useState<Cars[]>([]);
 
   const [influence, setInfluence] = useState<number>(0);
+  const [mafiaInfluence, setMafiaInfluence] = useState<number>(0);
+  const [bankerInfluence, setBankerInfluence] = useState<number>(0);
   const [loans, setLoans] = useState<Loan[]>([]);
   const [currentTroubles, setCurrentTroubles] = useState<LegalTrouble[]>([]);
   const [lastTroubleCheck, setLastTroubleCheck] = useState<number>(Date.now());
@@ -118,6 +122,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
       const storedProperties = await AsyncStorage.getItem(PROPERTIES_KEY);
       const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
+      const storedMafiaInfluence = await AsyncStorage.getItem(
+        MAFIA_INFLUENCE_KEY
+      );
       const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
       const storedTroubles = await AsyncStorage.getItem(TROUBLES_KEY);
       const storedCars = await AsyncStorage.getItem(CARS_KEY);
@@ -265,7 +272,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     const maxTroubleCheckInterval = 10000; // Check for new troubles every 10 seconds
 
     const timer = setInterval(() => {
-      const totalIncome = getTotalIncome() + getTotalRentalIncome() + getTotalCarMaintainace();
+      const totalIncome =
+        getTotalIncome() + getTotalRentalIncome() + getTotalCarMaintainace();
       const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
       let newBalance = balance + incomePerSecond;
 
@@ -405,6 +413,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const increaseInfluence = async (
+    id: string,
     influenceCost: number,
     influenceAmount: number
   ) => {
@@ -414,16 +423,36 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         return;
       }
 
-      const newInfluence = influence + influenceAmount;
       const newBalance = balance - influenceCost;
 
-      await AsyncStorage.setItem(INFLUENCE_KEY, newInfluence.toString());
+      if (id === "mafia") {
+        const newInfluence = mafiaInfluence + influenceAmount;
+
+        await AsyncStorage.setItem(
+          MAFIA_INFLUENCE_KEY,
+          newInfluence.toString()
+        );
+        setMafiaInfluence(newInfluence);
+      } else if (id === "bankers") {
+        const newInfluence = bankerInfluence + influenceAmount;
+
+        await AsyncStorage.setItem(
+          BANKER_INFLUENCE_KEY,
+          newInfluence.toString()
+        );
+
+        setBankerInfluence(newInfluence);
+      } else {
+        const newInfluence = influence + influenceAmount;
+
+        await AsyncStorage.setItem(INFLUENCE_KEY, newInfluence.toString());
+        setInfluence(newInfluence);
+      }
       await AsyncStorage.setItem(BALANCE_KEY, newBalance.toString());
 
-      setInfluence(newInfluence);
       setBalance(newBalance);
 
-      Alert.alert("Success", `${influenceAmount} Influence increased`);
+      Alert.alert("Success", `${influenceAmount} ${id} Influence increased`);
     } catch (error) {
       console.error("Error updating influence:", error);
     }
@@ -557,7 +586,6 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     Alert.alert("Success", `${property.location} sold for $${property.price}.`);
   };
 
-
   const buyCars = async (carId: string) => {
     const car = availableCars.find((p) => p.id === carId);
     if (!car) {
@@ -574,9 +602,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     await updateBalance(newBalance);
 
     const newOwnedCars = [...ownedCars, car];
-    const newAvailableCars = availableCars.filter(
-      (p) => p.id !== carId
-    );
+    const newAvailableCars = availableCars.filter((p) => p.id !== carId);
 
     await updateCars(newOwnedCars, newAvailableCars);
 
@@ -586,16 +612,10 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
-  const updateCars = async (
-    newOwnedCars: Cars[],
-    newAvailableCars: Cars[]
-  ) => {
+  const updateCars = async (newOwnedCars: Cars[], newAvailableCars: Cars[]) => {
     try {
       const ownedCarIds = newOwnedCars.map((p) => p.id);
-      await AsyncStorage.setItem(
-        CARS_KEY,
-        JSON.stringify(ownedCarIds)
-      );
+      await AsyncStorage.setItem(CARS_KEY, JSON.stringify(ownedCarIds));
       setOwnedCars(newOwnedCars);
       setAvailableCars(newAvailableCars);
     } catch (error) {
@@ -613,9 +633,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     const newBalance = balance + cars.price * 0.6;
     await updateBalance(newBalance);
 
-    const newOwnedCars = ownedCars.filter(
-      (p) => p.id !== carId
-    );
+    const newOwnedCars = ownedCars.filter((p) => p.id !== carId);
     const newAvailableCars = [...availableCars, cars];
 
     await updateCars(newOwnedCars, newAvailableCars);
@@ -628,6 +646,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         balance,
         influence,
+        bankerInfluence,
+        mafiaInfluence,
         ownedBusinesses,
         ownedProperties,
         ownedCars,

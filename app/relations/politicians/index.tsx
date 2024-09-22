@@ -24,16 +24,23 @@ const PoliticianRelations = () => {
 
   const politicianOptions = [
     {
+      id: "politician",
       amount: 250000,
       level: "Regional Level Politician",
       influence: 5,
     },
     {
+      id: "politician",
       amount: 5000000,
       level: "State Level Politician",
       influence: 2,
     },
-    { amount: 15000000, level: "Prime Minister", influence: 1 },
+    {
+      id: "politician",
+      amount: 15000000,
+      level: "Prime Minister",
+      influence: 1,
+    },
   ];
 
   const { increaseInfluence } = useBusinessContext();
@@ -106,7 +113,9 @@ const PoliticianRelations = () => {
                   >
                     <View style={styles.containerThree}>
                       <Pressable
-                        onPress={() => increaseInfluence(item.amount,item.influence)}
+                        onPress={() =>
+                          increaseInfluence( item.id,item.amount, item.influence)
+                        }
                       >
                         <View
                           style={[
