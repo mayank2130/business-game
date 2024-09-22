@@ -89,6 +89,15 @@ const OwnedCarsCard: React.FC<{ item: Cars }> = ({ item }) => {
 };
 
 const OwnedCarsList: React.FC = () => {
+
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Your Cars",
+    });
+  }, []);
+  
   const { ownedCars } = useBusinessContext();
 
   const properties = ownedCars.length <= 0;
@@ -96,7 +105,7 @@ const OwnedCarsList: React.FC = () => {
   return (
     <View style={{ flex: 1, alignItems: "center", paddingVertical: 10 }}>
       {properties ? (
-        <Text>You don't own any properties!</Text>
+        <Text>You don't own any Cars!</Text>
       ) : (
         <FlatList
           data={ownedCars}
