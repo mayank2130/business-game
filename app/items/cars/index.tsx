@@ -107,7 +107,7 @@ const CarsList: React.FC = () => {
   return (
     <View style={{ flex: 1, alignItems: "center", paddingVertical: 10 }}>
       {cars ? (
-        <Text>You don't own any Cars!</Text>
+        <Text>No more available cars!</Text>
       ) : (
         <FlatList
           data={availableCars}
