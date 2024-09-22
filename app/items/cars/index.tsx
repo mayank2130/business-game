@@ -93,16 +93,28 @@ const CarsCard: React.FC<{ item: Cars }> = ({ item }) => {
 };
 
 const CarsList: React.FC = () => {
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Available Cars",
+    });
+  }, []);
+
   const { availableCars } = useBusinessContext();
-  const cars = availableCars;
+  const cars = availableCars.length <= 0;
 
   return (
     <View style={{ flex: 1, alignItems: "center", paddingVertical: 10 }}>
-      <FlatList
-        data={cars}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <CarsCard item={item} />}
-      />
+      {cars ? (
+        <Text>You don't own any Cars!</Text>
+      ) : (
+        <FlatList
+          data={availableCars}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <CarsCard item={item} />}
+        />
+      )}
     </View>
   );
 };
