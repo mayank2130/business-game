@@ -9,8 +9,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BusinessOptions, OptionLevels } from "@/constants/Business";
 import { Alert } from "react-native";
 import { personalPropertyData, Property } from "@/constants/Property";
-import { getLegalTroubles, LegalTrouble } from "@/constants/Troubles";
+import { getLegalTroubles } from "@/constants/Troubles";
 import { Cars, carsData } from "@/constants/Cars";
+import { LegalTrouble } from "@/constants/TroubleTypes";
 
 export const BALANCE_KEY = "@game_full_balance";
 export const BUSINESSES_KEY = "@game_businesses";
@@ -74,6 +75,7 @@ interface BusinessContextType {
   getTotalIncome: () => number;
   getTotalRentalIncome: () => number;
   getTotalCarMaintainace: () => number;
+  getTotalPropertyMaintainance: () => number;
   sellProperty: (propertyId: string) => Promise<void>;
   buyProperty: (propertyId: string) => Promise<void>;
   sellCars: (carId: string) => Promise<void>;
@@ -125,6 +127,9 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       const storedMafiaInfluence = await AsyncStorage.getItem(
         MAFIA_INFLUENCE_KEY
       );
+      const storedBankerInfluence = await AsyncStorage.getItem(
+        BANKER_INFLUENCE_KEY
+      );
       const storedLoans = await AsyncStorage.getItem(LOANS_KEY);
       const storedTroubles = await AsyncStorage.getItem(TROUBLES_KEY);
       const storedCars = await AsyncStorage.getItem(CARS_KEY);
@@ -136,6 +141,12 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       if (storedBusinesses !== null)
         setOwnedBusinesses(JSON.parse(storedBusinesses));
       if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
+      if (storedMafiaInfluence !== null)
+        setMafiaInfluence(parseFloat(storedMafiaInfluence));
+      if (storedMafiaInfluence !== null)
+        setMafiaInfluence(parseFloat(storedMafiaInfluence));
+      if (storedBankerInfluence !== null)
+        setMafiaInfluence(parseFloat(storedBankerInfluence));
       if (storedLoans !== null) setLoans(JSON.parse(storedLoans));
 
       const allCars = carsData;
@@ -183,7 +194,11 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     )
       return;
 
-    const troubles = getLegalTroubles();
+    const troubles = getLegalTroubles({
+      influence,
+      bankerInfluence,
+      mafiaInfluence,
+    });
     const scaleFactor = Math.log(balance + influence + 1) / Math.log(10);
 
     let newTrouble: LegalTrouble | null = null;
@@ -237,7 +252,10 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       const option = trouble.resolutionOptions[optionIndex];
       if (!option) return;
 
-      if (balance < option.cost || influence < option.influenceCost) {
+      const isFirstOption = optionIndex === 0;
+      const totalCost = isFirstOption ? option.cost * 7 : option.cost;
+
+      if (balance < totalCost || influence < option.influenceCost) {
         Alert.alert(
           "Error",
           "Insufficient funds or influence to resolve this trouble."
@@ -246,16 +264,40 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (Math.random() < option.successProbability) {
+        if (isFirstOption) {
+          // Set up daily deductions for a week
+          let daysLeft = 7;
+          const dailyDeduction = () => {
+            if (daysLeft > 0) {
+              setBalance((prev) => prev - option.cost);
+              daysLeft--;
+              if (daysLeft > 0) {
+                // Schedule next deduction
+                setTimeout(dailyDeduction, 24 * 60 * 60 * 1000); // 24 hours
+              }
+            }
+          };
+          dailyDeduction(); // Start the daily deductions
+        } else {
+          // Deduct cost immediately for other options
+          setBalance((prev) => prev - option.cost);
+        }
+
         setCurrentTroubles((prev) => {
           const updated = prev.filter((t) => t.id !== troubleId);
           AsyncStorage.setItem(TROUBLES_KEY, JSON.stringify(updated));
           return updated;
         });
-        setBalance((prev) => prev - option.cost);
+
         setInfluence((prev) => prev - option.influenceCost);
+
         Alert.alert(
           "Success",
-          `You successfully resolved the ${trouble.name} using the "${option.name}" approach.`
+          `You successfully resolved the ${trouble.name} using the "${
+            option.name
+          }" approach.${
+            isFirstOption ? " The cost will be deducted daily for 1 week." : ""
+          }`
         );
       } else {
         Alert.alert(
@@ -273,7 +315,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const timer = setInterval(() => {
       const totalIncome =
-        getTotalIncome() + getTotalRentalIncome() + getTotalCarMaintainace();
+        getTotalIncome() + getTotalRentalIncome() + getTotalCarMaintainace() + getTotalPropertyMaintainance();
       const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
       let newBalance = balance + incomePerSecond;
 
@@ -514,6 +556,12 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       0
     );
   };
+  const getTotalPropertyMaintainance = (): number => {
+    return ownedProperties.reduce(
+      (total, property) => total - (property.maintainance || 0),
+      0
+    );
+  };
 
   const getTotalCarMaintainace = (): number => {
     return ownedCars.reduce(
@@ -663,6 +711,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         getTotalIncome,
         getTotalRentalIncome,
         getTotalCarMaintainace,
+        getTotalPropertyMaintainance,
         sellProperty,
         buyProperty,
         buyCars,

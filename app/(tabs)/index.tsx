@@ -20,6 +20,7 @@ const App = () => {
     mafiaInfluence,
     currentTroubles,
     getTotalCarMaintainace,
+    getTotalPropertyMaintainance,
   } = useBusinessContext();
 
   const navigation = useNavigation();
@@ -94,7 +95,10 @@ const App = () => {
           Expenses:
         </Text>
         <Text style={[styles.balanceTxt, { color: "red", paddingLeft: 10 }]}>
-          - $ {getTotalCarMaintainace().toLocaleString()}
+          - ${" "}
+          {(
+            getTotalCarMaintainace() + getTotalPropertyMaintainance()
+          ).toLocaleString()}
         </Text>
       </View>
       <TouchableOpacity
