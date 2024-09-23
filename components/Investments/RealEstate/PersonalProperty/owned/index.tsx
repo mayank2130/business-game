@@ -23,8 +23,11 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
           <Text style={styles.price}>
             Value: $ {item.price.toLocaleString()}
           </Text>
-          <Text style={[styles.price, { fontSize: 16, fontFamily: "mon-sb" }]}>
+          <Text style={[styles.price, { fontSize: 16, fontFamily: "mon-sb", color:"green" }]}>
             Rent: $ {item.rentalIncome.toLocaleString()}/hour
+          </Text>
+          <Text style={[styles.price, { fontSize: 14, fontFamily: "mon-sb", color:"red" }]}>
+            Maintainance: $ {item.maintainance.toLocaleString()}/hour
           </Text>
           <View style={styles.locationContainer}>
             <Entypo name="location" size={16} color="black" />
@@ -72,7 +75,7 @@ const PropertyList: React.FC = () => {
 const styles = StyleSheet.create({
   card: {
     width: 350,
-    height: 310,
+    height: 320,
     borderRadius: 10,
     marginVertical: 12,
     marginHorizontal: 16,
@@ -96,7 +99,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontFamily: "mon-sb",
-    fontSize: 20,
+    fontSize: 18,
     paddingLeft: 10,
     paddingBottom: 3,
   },

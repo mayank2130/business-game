@@ -27,6 +27,12 @@ const PropertyCard: React.FC<{ item: Property }> = ({ item }) => {
       <View style={{ flexDirection: "row", alignItems: "center" }}>
         <View style={styles.cardDetails}>
           <Text style={styles.price}>$ {item.price.toLocaleString()}</Text>
+          <Text style={[styles.price, { fontSize: 16, fontFamily: "mon-sb", color:"green" }]}>
+            Rent: $ {item.rentalIncome.toLocaleString()}
+          </Text>
+          <Text style={[styles.price, { fontSize: 14, fontFamily: "mon-sb", color:"red", marginBottom:2 }]}>
+            Maintainance: $ {item.maintainance.toLocaleString()}
+          </Text>
           <View style={styles.locationContainer}>
             <Entypo name="location" size={16} color="black" />
             <Text style={styles.location}>{item.location}</Text>
@@ -68,7 +74,7 @@ const PropertyList: React.FC = () => {
 const styles = StyleSheet.create({
   card: {
     width: 350,
-    height: 310,
+    height: 330,
     borderRadius: 10,
     marginVertical: 12,
     marginHorizontal: 16,
@@ -92,7 +98,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontFamily: "mon-sb",
-    fontSize: 20,
+    fontSize: 18,
     paddingLeft: 10,
     paddingBottom: 3,
   },
@@ -103,7 +109,7 @@ const styles = StyleSheet.create({
   },
   location: {
     fontFamily: "mon",
-    fontSize: 13,
+    fontSize: 12,
     letterSpacing: 1,
     marginLeft: 5,
   },

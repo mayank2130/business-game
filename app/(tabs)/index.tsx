@@ -109,9 +109,9 @@ const App = () => {
         <Text style={{ fontFamily: "mon", marginTop: 5 }}>
           Click in this area to make money
         </Text>
-        <Text>Political Influence: {influence}</Text>
+        {/* <Text>Political Influence: {influence}</Text>
         <Text>Banker Influence: {bankerInfluence}</Text>
-        <Text>Mafia Influence: {mafiaInfluence}</Text>
+        <Text>Mafia Influence: {mafiaInfluence}</Text> */}
       </TouchableOpacity>
       <TouchableOpacity
         onPress={() => router.push("/troubles")}
