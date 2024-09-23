@@ -35,7 +35,7 @@ const Profile = () => {
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.openButton}
-        onPress={() => router.push("/capital/loans")}
+        onPress={() => router.push("/business/liscence")}
       >
         <Text style={styles.openButtonText}>Business Lisences</Text>
       </TouchableOpacity>
