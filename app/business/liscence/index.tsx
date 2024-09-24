@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import {
   View,
   Text,
@@ -6,12 +6,23 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { Liscence } from "@/constants/Liscence";
+import { useNavigation } from "expo-router";
+import { useBusinessContext } from "@/lib/context";
 
 const Specialization = () => {
+  const navigation = useNavigation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerTitle: "Available Liscences",
+    });
+  }, []);
+
+  const { buyLiscence, availableLiscence } = useBusinessContext();
+
   return (
-    <ScrollView style={{ marginBottom: 40 }}>
-      {Liscence.map((item) => (
+    <ScrollView style={{ marginBottom: 10 }}>
+      {availableLiscence.map((item) => (
         <View key={item.id} style={styles.container}>
           <View style={[styles.segment, styles.darkSegment]}>
             <View
@@ -63,7 +74,10 @@ const Specialization = () => {
                 />
               </View>
             </View>
-            <TouchableOpacity style={styles.changeButton}>
+            <TouchableOpacity
+              style={styles.changeButton}
+              onPress={() => buyLiscence(item.id)}
+            >
               <Text style={styles.changeButtonText}>Apply for Liscence</Text>
             </TouchableOpacity>
           </View>
@@ -95,10 +109,9 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 8,
     padding: 16,
-    marginBottom: 16,
   },
   darkSegment: {
-    backgroundColor: "#2A3439",
+    backgroundColor: "#555555",
   },
   segmentTitle: {
     fontSize: 18,
@@ -134,7 +147,7 @@ const styles = StyleSheet.create({
     height: "100%",
   },
   changeButton: {
-    backgroundColor: "#848482",
+    backgroundColor: "#343434",
     padding: 16,
     borderRadius: 8,
     alignItems: "center",
