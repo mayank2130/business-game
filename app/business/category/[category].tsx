@@ -21,8 +21,14 @@ const BusinessOption: React.FC = () => {
   const { category } = useLocalSearchParams<{ category: string }>();
   const navigation = useNavigation();
   const router = useRouter();
-  const { balance, ownedBusinesses, updateBalance, updateBusinesses } =
-    useBusinessContext();
+  const {
+    balance,
+    ownedBusinesses,
+    updateBalance,
+    updateBusinesses,
+    ownedLiscence,
+    availableLiscence,
+  } = useBusinessContext();
 
   const [newBusinessName, setNewBusinessName] = useState<string>("");
   const [selectedOption, setSelectedOption] = useState<BusinessOptions | null>(
@@ -48,6 +54,21 @@ const BusinessOption: React.FC = () => {
       Alert.alert(
         "Error",
         "Please select an option, enter a business name, and ensure you have sufficient balance."
+      );
+      return;
+    }
+
+    const requiredLicense = availableLiscence.find(
+      (license) => license.value === businessType?.value
+    );
+    const hasLicense = ownedLiscence.some(
+      (license) => license.value === businessType?.value
+    );
+
+    if (requiredLicense && !hasLicense) {
+      Alert.alert(
+        "License Required",
+        `You need to obtain a ${requiredLicense.name} before purchasing this business. Please apply for the license first.`
       );
       return;
     }
@@ -95,6 +116,13 @@ const BusinessOption: React.FC = () => {
     );
   }
 
+  const requiredLicense = availableLiscence.find(
+    (license) => license.value === businessType.value
+  );
+  const hasLicense = ownedLiscence.some(
+    (license) => license.value === businessType.value
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>{businessType.name} Options</Text>
@@ -104,7 +132,7 @@ const BusinessOption: React.FC = () => {
       <FlatList
         data={businessType.options}
         renderItem={renderOption}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
       />
       <TextInput
         style={styles.input}
@@ -112,8 +140,22 @@ const BusinessOption: React.FC = () => {
         onChangeText={setNewBusinessName}
         placeholder="Enter your new business name"
       />
-      <TouchableOpacity style={styles.buyButton} onPress={buyBusiness}>
-        <Text style={styles.buyButtonText}>Buy Business</Text>
+      <TouchableOpacity
+        style={[
+          styles.buyButton,
+          {
+            backgroundColor:
+              requiredLicense && !hasLicense ? "#C0C0C0" : "#03C03C",
+          },
+        ]}
+        onPress={buyBusiness}
+        disabled={requiredLicense && !hasLicense}
+      >
+        <Text style={styles.buyButtonText}>
+          {requiredLicense && !hasLicense
+            ? `Apply for ${requiredLicense.name} first`
+            : "Buy Business"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
