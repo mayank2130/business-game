@@ -12,6 +12,7 @@ import { personalPropertyData, Property } from "@/constants/Property";
 import { getLegalTroubles } from "@/constants/Troubles";
 import { Cars, carsData } from "@/constants/Cars";
 import { LegalTrouble } from "@/constants/TroubleTypes";
+import { BusinessLiscences, Liscence } from "@/constants/Liscence";
 
 export const BALANCE_KEY = "@game_full_balance";
 export const BUSINESSES_KEY = "@game_businesses";
@@ -22,6 +23,7 @@ export const LOANS_KEY = "@game_loans";
 export const PROPERTIES_KEY = "@game_properties";
 export const TROUBLES_KEY = "@game_new_troubles_laws";
 export const CARS_KEY = "@game_cars";
+export const LISCENCE_KEY = "@game_liscence";
 export const MAX_TROUBLES = 3;
 
 // const MAX_TROUBLES = 3;
@@ -60,7 +62,9 @@ interface BusinessContextType {
   ownedBusinesses: BusinessOptions[];
   ownedProperties: Property[];
   ownedCars: Cars[];
+  ownedLiscence: Liscence[];
   availableProperties: Property[];
+  availableLiscence: Liscence[];
   availableCars: Cars[];
   loans: Loan[];
   updateBalance: (newBalance: number) => Promise<void>;
@@ -78,6 +82,7 @@ interface BusinessContextType {
   getTotalPropertyMaintainance: () => number;
   sellProperty: (propertyId: string) => Promise<void>;
   buyProperty: (propertyId: string) => Promise<void>;
+  buyLiscence: (liscenceId: number) => Promise<void>;
   sellCars: (carId: string) => Promise<void>;
   buyCars: (carId: string) => Promise<void>;
   increaseInfluence: (
@@ -105,6 +110,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
   const [availableProperties, setAvailableProperties] = useState<Property[]>(
     []
   );
+  const [ownedLiscence, setOwnedLiscence] = useState<Liscence[]>([]);
+  const [availableLiscence, setAvailableLiscence] = useState<Liscence[]>([]);
   const [ownedCars, setOwnedCars] = useState<Cars[]>([]);
   const [availableCars, setAvailableCars] = useState<Cars[]>([]);
 
@@ -122,6 +129,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       const storedBalance = await AsyncStorage.getItem(BALANCE_KEY);
       const storedBusinesses = await AsyncStorage.getItem(BUSINESSES_KEY);
+      const storedLiscence = await AsyncStorage.getItem(LISCENCE_KEY);
       const storedProperties = await AsyncStorage.getItem(PROPERTIES_KEY);
       const storedInfluence = await AsyncStorage.getItem(INFLUENCE_KEY);
       const storedMafiaInfluence = await AsyncStorage.getItem(
@@ -140,6 +148,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       if (storedBalance !== null) setBalance(parseFloat(storedBalance));
       if (storedBusinesses !== null)
         setOwnedBusinesses(JSON.parse(storedBusinesses));
+      if (storedLiscence !== null) setOwnedLiscence(JSON.parse(storedLiscence));
       if (storedInfluence !== null) setInfluence(parseFloat(storedInfluence));
       if (storedMafiaInfluence !== null)
         setMafiaInfluence(parseFloat(storedMafiaInfluence));
@@ -159,6 +168,20 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         setOwnedCars([]);
         setAvailableCars(allCars);
+      }
+
+      const allLiscence = BusinessLiscences;
+      if (storedLiscence !== null) {
+        const ownedLiscenceIds = JSON.parse(storedLiscence);
+        setOwnedLiscence(
+          allLiscence.filter((p: Liscence) => ownedLiscenceIds.includes(p.id))
+        );
+        setAvailableLiscence(
+          allLiscence.filter((p: Liscence) => !ownedLiscenceIds.includes(p.id))
+        );
+      } else {
+        setOwnedLiscence([]);
+        setAvailableLiscence(allLiscence);
       }
 
       const allProperties = personalPropertyData;
@@ -315,7 +338,10 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const timer = setInterval(() => {
       const totalIncome =
-        getTotalIncome() + getTotalRentalIncome() + getTotalCarMaintainace() + getTotalPropertyMaintainance();
+        getTotalIncome() +
+        getTotalRentalIncome() +
+        getTotalCarMaintainace() +
+        getTotalPropertyMaintainance();
       const incomePerSecond = totalIncome / 3600; // Convert hourly income to per-second
       let newBalance = balance + incomePerSecond;
 
@@ -597,6 +623,51 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
     );
   };
 
+  const buyLiscence = async (liscenceId: number) => {
+    const liscence = availableLiscence.find((p) => p.id == liscenceId);
+    if (!liscence) {
+      Alert.alert("Error", "Liscence not found.");
+      return;
+    }
+
+    if (balance < liscence.cost) {
+      Alert.alert("Error", "Insufficient balance to apply for this liscence.");
+      return;
+    }
+
+    const newBalance = balance - liscence.cost;
+    await updateBalance(newBalance);
+
+    const newOwnedLiscence = [...ownedLiscence, liscence];
+    const newAvailableLiscence = availableLiscence.filter(
+      (p) => p.id !== liscenceId
+    );
+
+    await updateLiscence(newOwnedLiscence, newAvailableLiscence);
+
+    Alert.alert(
+      "Success",
+      `${liscence.name} approved for $${liscence.cost.toLocaleString()}.`
+    );
+  };
+
+  const updateLiscence = async (
+    newOwnedLiscence: Liscence[],
+    newAvailableLiscence: Liscence[]
+  ) => {
+    try {
+      const ownedLiscenceIds = newOwnedLiscence.map((p) => p.id);
+      await AsyncStorage.setItem(
+        LISCENCE_KEY,
+        JSON.stringify(ownedLiscenceIds)
+      );
+      setOwnedLiscence(newOwnedLiscence);
+      setAvailableLiscence(newAvailableLiscence);
+    } catch (error) {
+      console.error("Error updating properties:", error);
+    }
+  };
+
   const updateProperties = async (
     newOwnedProperties: Property[],
     newAvailableProperties: Property[]
@@ -698,6 +769,8 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         mafiaInfluence,
         ownedBusinesses,
         ownedProperties,
+        ownedLiscence,
+        availableLiscence,
         ownedCars,
         availableProperties,
         availableCars,
@@ -714,6 +787,7 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         getTotalPropertyMaintainance,
         sellProperty,
         buyProperty,
+        buyLiscence,
         buyCars,
         sellCars,
         increaseInfluence,
