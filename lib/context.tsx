@@ -248,11 +248,11 @@ export const BusinessProvider: React.FC<{ children: React.ReactNode }> = ({
         return updated;
       });
 
-      Alert.alert(
-        "New Legal Trouble!",
-        `${newTrouble.name}: ${newTrouble.description}\n\nThis will cost you $${newTrouble.cost} and ${newTrouble.influenceCost} influence points if left unresolved.`,
-        [{ text: "View Details", onPress: () => {} }]
-      );
+      // Alert.alert(
+      //   "New Legal Trouble!",
+      //   `${newTrouble.name}: ${newTrouble.description}\n\nThis will cost you $${newTrouble.cost} and ${newTrouble.influenceCost} influence points if left unresolved.`,
+      //   [{ text: "View Details", onPress: () => {} }]
+      // );
     }
 
     // Schedule next check
